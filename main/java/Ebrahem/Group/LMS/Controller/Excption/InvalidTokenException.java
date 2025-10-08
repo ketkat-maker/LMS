@@ -1,4 +1,4 @@
-package Ebrahem.Group.LMS.Controller;
+package Ebrahem.Group.LMS.Controller.Excption;
 
 import org.springframework.stereotype.Component;
 

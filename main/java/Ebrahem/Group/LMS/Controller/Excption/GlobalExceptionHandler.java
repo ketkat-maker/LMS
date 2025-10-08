@@ -1,4 +1,4 @@
-package Ebrahem.Group.LMS.Controller;
+package Ebrahem.Group.LMS.Controller.Excption;
 
 import Ebrahem.Group.LMS.Model.Dtos.ApiError;
 import jakarta.servlet.http.HttpServletRequest;

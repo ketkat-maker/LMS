@@ -7,8 +7,8 @@ import Ebrahem.Group.LMS.Model.Entity.User;
 import Ebrahem.Group.LMS.Model.Enums.Role;
 import Ebrahem.Group.LMS.Repositories.UserRepository;
 import Ebrahem.Group.LMS.Security.LMSUserSecurity;
-import Ebrahem.Group.LMS.Service.AuthenticateService;
-import Ebrahem.Group.LMS.Service.UserService;
+import Ebrahem.Group.LMS.Service.JwtProviderService;
+import Ebrahem.Group.LMS.Service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -20,8 +20,8 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService {
-    private final AuthenticateService authenticateService;
+public class AdminServiceImpl implements AdminService {
+    private final JwtProviderService jwtProviderService;
     private final UserRepository repository;
     private final StudentMapper studentMapper;
     @PreAuthorize("hasRole('ADMIN')")
@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService {
     }
     private String getToken(User user) {
         LMSUserSecurity userDetails = new LMSUserSecurity(user);
-        return authenticateService.generateToken(userDetails);
+        return jwtProviderService.generateToken(userDetails);
     }
     private List<User> getUserList() {
         if(!repository.findByRole(Role.ADMIN).equals("ADMIN")){

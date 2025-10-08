@@ -7,7 +7,7 @@ import Ebrahem.Group.LMS.Model.Dtos.SignUpRequest;
 import Ebrahem.Group.LMS.Model.Entity.User;
 import Ebrahem.Group.LMS.Repositories.UserRepository;
 import Ebrahem.Group.LMS.Security.LMSUserSecurity;
-import Ebrahem.Group.LMS.Service.AuthenticateService;
+import Ebrahem.Group.LMS.Service.JwtProviderService;
 import Ebrahem.Group.LMS.Service.LogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,7 +19,7 @@ public class LogServiceImpl implements LogService {
     private final LogMapper mapper;
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
-    private final AuthenticateService authenticateService;
+    private final JwtProviderService jwtProviderService;
 
 
     @Override
@@ -44,7 +44,7 @@ public class LogServiceImpl implements LogService {
 
     private String getToken(User user) {
         LMSUserSecurity userDetails = new LMSUserSecurity(user);
-        return authenticateService.generateToken(userDetails);
+        return jwtProviderService.generateToken(userDetails);
     }
 
     private User SignUp(SignUpRequest signUpRequest) {

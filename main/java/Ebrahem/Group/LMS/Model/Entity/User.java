@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
@@ -61,6 +63,6 @@ public class User {
 
     @PrePersist
     protected void onCreated(){
-        this.createdAt=LocalDateTime.now();
+        this.createdAt=LocalDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS);
     }
 }

@@ -1,19 +1,10 @@
 package Ebrahem.Group.LMS.Model.Entity;
 
-import Ebrahem.Group.LMS.Model.Enums.Role;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
-
+import lombok.*;
+import java.time.*;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 @Data
 @AllArgsConstructor
@@ -22,15 +13,18 @@ import java.util.concurrent.ThreadLocalRandom;
 @Entity
 @Table(name = "courses")
 public class Course {
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID courseId;
 
     @Column(nullable = false)
     private String courseTitle;
 
-    @Column(name = "duration")
-    private int courseDuration;
+    @Convert(converter = DurationConverter.class)
+    private Duration courseDuration;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     @ManyToOne
     @JoinColumn(name = "instructor_id", nullable = false)
@@ -39,11 +33,20 @@ public class Course {
     @OneToMany(mappedBy = "course")
     private List<Enrollment> enrollments;
 
-
-    public Course(String courseTitle, int courseDuration, User instructor) {
+    public Course(String courseTitle, Duration courseDuration, User instructor) {
         this.courseTitle = courseTitle.toLowerCase();
         this.courseDuration = courseDuration;
-        this.instructor=instructor;
+        this.instructor = instructor;
+    }
+
+    @PrePersist
+    void createdAt() {
+        this.createdAt = LocalDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS);
+        this.updatedAt = LocalDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS);
+    }
+
+    @PreUpdate
+    void updatedAt() {
+        this.updatedAt = LocalDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS);
     }
 }
-

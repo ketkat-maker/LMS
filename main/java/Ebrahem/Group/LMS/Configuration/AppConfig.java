@@ -48,8 +48,8 @@ public class AppConfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html").permitAll()
                         .requestMatchers(POST, "/api/v1/auth/**").permitAll()
-                        .requestMatchers(GET, "/api/v1/students").hasRole("INSTRUCTOR")
-                        .requestMatchers(POST, "/api/v1/course").hasRole("INSTRUCTOR")
+                        .requestMatchers( "/api/v1/instructor").hasRole("INSTRUCTOR")
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

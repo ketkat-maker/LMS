@@ -2,7 +2,7 @@ package Ebrahem.Group.LMS.Controller;
 
 import Ebrahem.Group.LMS.Model.Dtos.Student;
 import Ebrahem.Group.LMS.Model.Dtos.UsersDto;
-import Ebrahem.Group.LMS.Service.UserService;
+import Ebrahem.Group.LMS.Service.AdminService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,28 +14,28 @@ import java.util.UUID;
 
 
 @RestController
-@RequestMapping(path = "/api/v1")
+@RequestMapping(path = "/api/v1/admin")
 @RequiredArgsConstructor
-public class UserController {
-     private final UserService userService;
+public class AdminController {
+     private final AdminService adminService;
      @Operation(summary = "Get all students And  instructors role ADMIN")
     @GetMapping("/Users")
     public ResponseEntity<List<Student>> getAllStudentAndInstructor() {
-        List<Student> allUsers = userService.getAllStudentAndInstructor();
+        List<Student> allUsers = adminService.getAllStudentAndInstructor();
         return ResponseEntity.ok(allUsers);
     }
 
-    @Operation(summary = "Delete a student by ID", description = "Requires ADMIN role")
+    @Operation(summary = "Delete  instructor or student by ID", description = "Requires ADMIN role")
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<String> deleteStudentOrInstructor(@PathVariable UUID id){
-        userService.deleteStudentOrInstructor(id);
+        adminService.deleteStudentOrInstructor(id);
         return new ResponseEntity<>(
                 "Student delete successfully ",HttpStatus.NO_CONTENT
         );
     }
     @GetMapping("/allUsers")
     public ResponseEntity<List<UsersDto>>getAllUsers(){
-        List<UsersDto> allByAdmin = userService.getAllByAdmin();
+        List<UsersDto> allByAdmin = adminService.getAllByAdmin();
         return  ResponseEntity.ok(allByAdmin);
 
     }
