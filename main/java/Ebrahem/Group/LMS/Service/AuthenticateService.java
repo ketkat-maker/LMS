@@ -3,7 +3,7 @@ package Ebrahem.Group.LMS.Service;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public interface AuthenticateService {
-    UserDetails authenticate(String email,String password);
+//    UserDetails authenticate(String email,String password);
     String generateToken(UserDetails details);
-    UserDetails validToken(String token);
+//    UserDetails validToken(String token);
 }

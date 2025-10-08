@@ -1,6 +1,7 @@
 package Ebrahem.Group.LMS.Controller;
 
 import Ebrahem.Group.LMS.Model.Dtos.Student;
+import Ebrahem.Group.LMS.Model.Dtos.UsersDto;
 import Ebrahem.Group.LMS.Service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -31,5 +32,11 @@ public class UserController {
         return new ResponseEntity<>(
                 "Student delete successfully ",HttpStatus.NO_CONTENT
         );
+    }
+    @GetMapping("/allUsers")
+    public ResponseEntity<List<UsersDto>>getAllUsers(){
+        List<UsersDto> allByAdmin = userService.getAllByAdmin();
+        return  ResponseEntity.ok(allByAdmin);
+
     }
 }

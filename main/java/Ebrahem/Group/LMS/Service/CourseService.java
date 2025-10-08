@@ -5,5 +5,5 @@ import Ebrahem.Group.LMS.Model.Dtos.CourseResponse;
 
 
 public interface CourseService {
-     CourseResponse CreateCourseResponse(CourseRequest course);
+     CourseResponse CreateCourseResponse(CourseRequest coursez);
 }

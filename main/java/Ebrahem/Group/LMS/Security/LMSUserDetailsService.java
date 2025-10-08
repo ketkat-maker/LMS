@@ -6,9 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
-//@Service
+@Service
 public class LMSUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
@@ -18,4 +19,5 @@ public class LMSUserDetailsService implements UserDetailsService {
                 orElseThrow(() -> new UsernameNotFoundException("User not foud by username:  " + username));
         return new LMSUserSecurity(user);
     }
+
 }
