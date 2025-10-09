@@ -7,6 +7,7 @@ import Ebrahem.Group.LMS.Model.Entity.User;
 import Ebrahem.Group.LMS.Repositories.CourseRepository;
 import Ebrahem.Group.LMS.Repositories.UserRepository;
 import Ebrahem.Group.LMS.Service.InstructorService;
+import Ebrahem.Group.LMS.Util.Utility;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,6 +23,7 @@ import static Ebrahem.Group.LMS.Model.Enums.Role.INSTRUCTOR;
 public class InstructorServiceImpl implements InstructorService {
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
+    private final Utility utility;
 
     @PreAuthorize("hasRole('INSTRUCTOR')")
     @Override
@@ -47,7 +49,7 @@ public class InstructorServiceImpl implements InstructorService {
                 .orElseThrow(() -> new IllegalArgumentException("Course not found by this ID: " + courseId));
 
         courseById.setCourseTitle(course.courseName());
-        courseById.setCourseDuration(parseDuration(course.courseDuration()));
+        courseById.setCourseDuration(utility.parseDuration(course.courseDuration()));
 
         Course updatedCourse = courseRepository.save(courseById);
         return buildResponse(updatedCourse);
@@ -63,43 +65,10 @@ public class InstructorServiceImpl implements InstructorService {
         if (courseRepository.existsByCourseTitle(course.courseName()))
             throw new IllegalArgumentException("Course already exists: " + course.courseName());
 
-        Duration duration = parseDuration(course.courseDuration());
+        Duration duration = utility.parseDuration(course.courseDuration());
         Course created = new Course(course.courseName(), duration, instructor);
         return courseRepository.save(created);
     }
-
-    private String formatDuration(Duration duration) {
-        if (duration == null) return "00h 00m";
-        long hours = duration.toHours();
-        long minutes = duration.toMinutesPart();
-        return String.format("%02dh %02dm", hours, minutes);
-    }
-
-    private Duration parseDuration(String formatted) {
-        if (formatted == null || formatted.isBlank()) return Duration.ZERO;
-        formatted = formatted.trim().toLowerCase();
-
-        long hours = 0;
-        long minutes = 0;
-
-        if (formatted.contains(":")) {
-            String[] parts = formatted.split(":");
-            hours = Long.parseLong(parts[0].trim());
-            minutes = Long.parseLong(parts[1].trim());
-        } else if (formatted.contains("h")) {
-            String[] parts = formatted.split("h");
-            hours = Long.parseLong(parts[0].trim());
-            if (parts.length > 1) {
-                String m = parts[1].replace("m", "").trim();
-                if (!m.isEmpty()) minutes = Long.parseLong(m);
-            }
-        } else if (formatted.endsWith("m")) {
-            minutes = Long.parseLong(formatted.replace("m", "").trim());
-        }
-
-        return Duration.ofHours(hours).plusMinutes(minutes);
-    }
-
     private CourseResponse buildResponse(Course course) {
         return new CourseResponse(
                 course.getInstructor().getUserId(),
@@ -108,7 +77,7 @@ public class InstructorServiceImpl implements InstructorService {
                 course.getInstructor().getUserName(),
                 course.getCreatedAt(),
                 course.getUpdatedAt(),
-                formatDuration(course.getCourseDuration())
+                utility.formatDuration(course.getCourseDuration())
         );
     }
 }

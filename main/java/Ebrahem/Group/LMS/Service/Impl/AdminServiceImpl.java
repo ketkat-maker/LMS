@@ -1,7 +1,7 @@
 package Ebrahem.Group.LMS.Service.Impl;
 
-import Ebrahem.Group.LMS.Mapper.StudentMapper;
-import Ebrahem.Group.LMS.Model.Dtos.Student;
+import Ebrahem.Group.LMS.Mapper.UserMapper;
+import Ebrahem.Group.LMS.Model.Dtos.UserResponse;
 import Ebrahem.Group.LMS.Model.Dtos.UsersDto;
 import Ebrahem.Group.LMS.Model.Entity.User;
 import Ebrahem.Group.LMS.Model.Enums.Role;
@@ -23,13 +23,13 @@ import java.util.UUID;
 public class AdminServiceImpl implements AdminService {
     private final JwtProviderService jwtProviderService;
     private final UserRepository repository;
-    private final StudentMapper studentMapper;
+    private final UserMapper userMapper;
     @PreAuthorize("hasRole('ADMIN')")
     @Override
-    public List<Student> getAllStudentAndInstructor()  {
+    public List<UserResponse> getAllStudentAndInstructor()  {
         List<Role> roles = Arrays.asList(Role.STUDENT, Role.INSTRUCTOR);
         List<User> byRole = repository.findByRoleIn(roles);
-        return studentMapper.toStudentFromEntity(byRole);
+        return userMapper.toUserDtoFromEntity(byRole);
     }
 
    @PreAuthorize("hasRole('ADMIN')")

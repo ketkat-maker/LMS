@@ -1,18 +1,18 @@
 package Ebrahem.Group.LMS.Mapper.Impl;
 
-import Ebrahem.Group.LMS.Mapper.StudentMapper;
-import Ebrahem.Group.LMS.Model.Dtos.Student;
+import Ebrahem.Group.LMS.Mapper.UserMapper;
+import Ebrahem.Group.LMS.Model.Dtos.UserResponse;
 import Ebrahem.Group.LMS.Model.Entity.User;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 @Component
-public class StudentMapperImpl implements StudentMapper {
+public class UserMapperImpl implements UserMapper {
 
     @Override
-    public List<Student> toStudentFromEntity(List<User> users) {
+    public List<UserResponse> toUserDtoFromEntity(List<User> users) {
         return users.stream()
-                .map(user -> new Student(
+                .map(user -> new UserResponse(
                         user.getUserId(),
                         user.getUserName(),
                         user.getUserEmail(),

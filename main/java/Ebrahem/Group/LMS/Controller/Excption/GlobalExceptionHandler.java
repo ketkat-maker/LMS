@@ -7,14 +7,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.time.LocalDateTime;
 
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-
-
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> handleGenericException(Exception ex, HttpServletRequest request) {
 
@@ -58,6 +57,16 @@ public ResponseEntity<ApiError> handleIllegalArgumentException(IllegalArgumentEx
                 .timestamp(LocalDateTime.now())
                 .build();
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }
+    @ExceptionHandler(HttpClientErrorException.class)
+    public ResponseEntity<ApiError> handleHttpClientErrorException(HttpClientErrorException ex,HttpServletRequest request) {
+        ApiError error = ApiError.builder()
+                .status(HttpStatus.FORBIDDEN.value())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .timestamp(LocalDateTime.now())
+                .build();
+        return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
     }
 
 }

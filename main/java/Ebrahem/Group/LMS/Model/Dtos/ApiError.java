@@ -1,5 +1,6 @@
 package Ebrahem.Group.LMS.Model.Dtos;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,5 +16,6 @@ public class ApiError {
     private String message;
     private int status;
     private String path;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime timestamp;
 }

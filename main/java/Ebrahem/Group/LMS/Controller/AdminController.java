@@ -1,6 +1,6 @@
 package Ebrahem.Group.LMS.Controller;
 
-import Ebrahem.Group.LMS.Model.Dtos.Student;
+import Ebrahem.Group.LMS.Model.Dtos.UserResponse;
 import Ebrahem.Group.LMS.Model.Dtos.UsersDto;
 import Ebrahem.Group.LMS.Service.AdminService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,8 +20,8 @@ public class AdminController {
      private final AdminService adminService;
      @Operation(summary = "Get all students And  instructors role ADMIN")
     @GetMapping("/Users")
-    public ResponseEntity<List<Student>> getAllStudentAndInstructor() {
-        List<Student> allUsers = adminService.getAllStudentAndInstructor();
+    public ResponseEntity<List<UserResponse>> getAllStudentAndInstructor() {
+        List<UserResponse> allUsers = adminService.getAllStudentAndInstructor();
         return ResponseEntity.ok(allUsers);
     }
 
@@ -30,7 +30,7 @@ public class AdminController {
     public ResponseEntity<String> deleteStudentOrInstructor(@PathVariable UUID id){
         adminService.deleteStudentOrInstructor(id);
         return new ResponseEntity<>(
-                "Student delete successfully ",HttpStatus.NO_CONTENT
+                "UserResponse delete successfully ",HttpStatus.NO_CONTENT
         );
     }
     @GetMapping("/allUsers")

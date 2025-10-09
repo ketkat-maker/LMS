@@ -1,5 +1,8 @@
 package Ebrahem.Group.LMS.Configuration;
 
+import Ebrahem.Group.LMS.Controller.Excption.CustomAccessDeniedHandler;
+import Ebrahem.Group.LMS.Controller.Excption.CustomAuthenticationEntryPoint;
+import Ebrahem.Group.LMS.Model.Enums.Role;
 import Ebrahem.Group.LMS.Repositories.UserRepository;
 import Ebrahem.Group.LMS.Security.LMSUserDetailsService;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +32,8 @@ import static org.springframework.http.HttpMethod.POST;
 @RequiredArgsConstructor
 public class AppConfig {
 
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     @Bean
     public UserDetailsService userDetailsService(UserRepository userRepository) {
         return new LMSUserDetailsService(userRepository);
@@ -50,8 +55,11 @@ public class AppConfig {
                         .requestMatchers(POST, "/api/v1/auth/**").permitAll()
                         .requestMatchers( "/api/v1/instructor").hasRole("INSTRUCTOR")
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/student/**").hasAnyRole("STUDENT","INSTRUCTOR","ADMIN")
                         .anyRequest().authenticated()
-                )
+                ).exceptionHandling(e->e.
+                        authenticationEntryPoint(customAuthenticationEntryPoint)
+                        .accessDeniedHandler(customAccessDeniedHandler))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
