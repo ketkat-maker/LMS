@@ -33,6 +33,7 @@ public class AdminController {
                 "UserResponse delete successfully ",HttpStatus.NO_CONTENT
         );
     }
+    @Operation(summary = "get all users include (inst and stud) ", description = "Requires ADMIN role")
     @GetMapping("/allUsers")
     public ResponseEntity<List<UsersDto>>getAllUsers(){
         List<UsersDto> allByAdmin = adminService.getAllByAdmin();

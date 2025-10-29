@@ -69,31 +69,17 @@ public ResponseEntity<ApiError> handleIllegalArgumentException(IllegalArgumentEx
         return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
     }
 
-}
+    @ExceptionHandler(DuplicateEntityException.class)
+    public ResponseEntity<ApiError> handleDuplicateEntityException(DuplicateEntityException ex,HttpServletRequest request) {
+        ApiError error = ApiError.builder()
+                .status(HttpStatus.NOT_ACCEPTABLE.value())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .timestamp(LocalDateTime.now())
+                .build();
+        return new ResponseEntity<>(error, HttpStatus.NOT_ACCEPTABLE);
+    }
+    }
 
 
-//class CustomAccessDeniedHandler implements AccessDeniedHandler {
-//
-//    private static final Logger logger = LoggerFactory.getLogger(CustomAccessDeniedHandler.class);
-//
-//    @Override
-//    public void handle(HttpServletRequest request,
-//                       HttpServletResponse response,
-//                       AccessDeniedException accessDeniedException) throws IOException, ServletException {
-//
-//        logger.warn("Access denied for URI: {} - Message: {}",
-//                request.getRequestURI(), accessDeniedException.getMessage());
-//
-//        ApiError error = ApiError.builder()
-//                .status(HttpStatus.FORBIDDEN.value())
-//                .message("Access Denied")
-//                .build();
-//
-//        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-//        response.setContentType("application/json");
-//        response.getWriter().write(
-//                String.format("{\"status\": %d, \"message\": \"%s\"}",
-//                        error.getStatus(), error.getMessage())
-//        );
-//    }
-//}
+

@@ -1,6 +1,6 @@
 package Ebrahem.Group.LMS.Service.Impl;
 
-import Ebrahem.Group.LMS.Mapper.LogMapper;
+
 import Ebrahem.Group.LMS.Model.Dtos.AuthResponse;
 import Ebrahem.Group.LMS.Model.Dtos.LogInRequest;
 import Ebrahem.Group.LMS.Model.Dtos.SignUpRequest;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class LogServiceImpl implements LogService {
-    private final LogMapper mapper;
+
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProviderService jwtProviderService;
@@ -53,7 +53,7 @@ public class LogServiceImpl implements LogService {
         if(existsByUserEmail){
             throw new IllegalArgumentException("User already exist");
         }
-        User entityFromSignUp = mapper.toEntityFromSignUp(signUpRequest);
+        User entityFromSignUp = toEntityFromSignUp(signUpRequest);
 
         return repository.save(entityFromSignUp);
     }
@@ -69,6 +69,13 @@ public AuthResponse getTokenFromSingUp(SignUpRequest signUpRequest){
             getToken(signUp)
     );
 }
+    private User toEntityFromSignUp(SignUpRequest signUpRequest) {
+        return new User(
+                passwordEncoder.encode(signUpRequest.password()),
+                signUpRequest.role()
+                ,signUpRequest.userEmail()
+                ,signUpRequest.firstName()+" "+signUpRequest.lastName());
+    }
 }
 
 

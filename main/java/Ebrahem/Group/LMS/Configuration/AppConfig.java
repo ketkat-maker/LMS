@@ -2,7 +2,6 @@ package Ebrahem.Group.LMS.Configuration;
 
 import Ebrahem.Group.LMS.Controller.Excption.CustomAccessDeniedHandler;
 import Ebrahem.Group.LMS.Controller.Excption.CustomAuthenticationEntryPoint;
-import Ebrahem.Group.LMS.Model.Enums.Role;
 import Ebrahem.Group.LMS.Repositories.UserRepository;
 import Ebrahem.Group.LMS.Security.LMSUserDetailsService;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import static org.springframework.http.HttpMethod.GET;
+
 import static org.springframework.http.HttpMethod.POST;
 
 @EnableWebSecurity
@@ -56,6 +55,7 @@ public class AppConfig {
                         .requestMatchers( "/api/v1/instructor").hasRole("INSTRUCTOR")
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/student/**").hasAnyRole("STUDENT","INSTRUCTOR","ADMIN")
+                        .requestMatchers("/api/v1/instructor/**").hasAnyRole("STUDENT","INSTRUCTOR")
                         .anyRequest().authenticated()
                 ).exceptionHandling(e->e.
                         authenticationEntryPoint(customAuthenticationEntryPoint)
