@@ -46,5 +46,10 @@ public class EnrollmentServiceImpl implements EnrollmentService {
                 , LocalDateTime.now());
         return enrollmentRepository.save(savedEnroll);
     }
-
+//private float calculateStudentProgress(float progress){
+//        if (progress == 0.0f){
+//            return  0.0f;
+//        }
+//        return 0.0f
+//}
 }

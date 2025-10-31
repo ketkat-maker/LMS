@@ -23,7 +23,6 @@ private final StudentService studentService;
         return new ResponseEntity<>(
                 allCourses,
                 HttpStatus.ACCEPTED);
-
     }
 
 }

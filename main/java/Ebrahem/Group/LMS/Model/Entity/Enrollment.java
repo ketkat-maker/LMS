@@ -53,8 +53,8 @@ public class Enrollment {
 
     @PrePersist
     private void onEnroll() {
-        if (this.enrollAt == null) {
+
             this.enrollAt = LocalDateTime.now();
-        }
+
     }
 }

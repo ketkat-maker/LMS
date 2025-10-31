@@ -22,7 +22,7 @@ public class LogController {
     @PostMapping(path = "/login")
     public ResponseEntity<AuthResponse> logIn(@RequestBody LogInRequest request) {
         AuthResponse response = logInService.LogIn(request);
-        return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Operation(summary = "You don't have account yet")
