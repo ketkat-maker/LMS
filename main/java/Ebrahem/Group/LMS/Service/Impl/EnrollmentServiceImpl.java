@@ -1,6 +1,6 @@
 package Ebrahem.Group.LMS.Service.Impl;
 
-import Ebrahem.Group.LMS.Controller.Excption.DuplicateEntityException;
+import Ebrahem.Group.LMS.Excption.DuplicateEntityException;
 import Ebrahem.Group.LMS.Model.Dtos.EnrollmentRequest;
 import Ebrahem.Group.LMS.Model.Entity.Course;
 import Ebrahem.Group.LMS.Model.Entity.Enrollment;
@@ -22,6 +22,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     private final EnrollmentRepository enrollmentRepository;
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
+
     @PreAuthorize("hasRole('INSTRUCTOR') or hasRole('STUDENT')")
     @Override
     public Enrollment enrollInCourse(EnrollmentRequest request) {
@@ -29,15 +30,15 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         String courseName = request.courseName();
 
         User existUser = userRepository.findByUserName(studentName).
-                orElseThrow(()->new IllegalArgumentException("User does not exist by this name: "+ studentName));
+                orElseThrow(() -> new IllegalArgumentException("User does not exist by this name: " + studentName));
         Course existsCourse = courseRepository.findByCourseTitle(courseName).
-                orElseThrow(()->new IllegalArgumentException("course does not exist by this name: "+ courseName));
+                orElseThrow(() -> new IllegalArgumentException("course does not exist by this name: " + courseName));
         boolean alreadyEnrolled = enrollmentRepository.existsByUserAndCourse(
                 existUser,
                 existsCourse
         );
-        if(alreadyEnrolled){
-            throw new DuplicateEntityException("Student Already enroll by this name: "+studentName);
+        if (alreadyEnrolled) {
+            throw new DuplicateEntityException("Student Already enroll by this name: " + studentName);
         }
         Enrollment savedEnroll = new Enrollment(existUser
                 , existsCourse

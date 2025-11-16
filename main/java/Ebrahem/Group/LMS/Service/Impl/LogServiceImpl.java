@@ -50,31 +50,33 @@ public class LogServiceImpl implements LogService {
     private User SignUp(SignUpRequest signUpRequest) {
         boolean existsByUserEmail = repository.existsByUserEmail(signUpRequest.userEmail());
 
-        if(existsByUserEmail){
+        if (existsByUserEmail) {
             throw new IllegalArgumentException("User already exist");
         }
         User entityFromSignUp = toEntityFromSignUp(signUpRequest);
 
         return repository.save(entityFromSignUp);
     }
-    @Override
-public AuthResponse getTokenFromSingUp(SignUpRequest signUpRequest){
 
-    User signUp = SignUp(signUpRequest);
-    return new AuthResponse(
-            signUp.getUserId(),
-            signUp.getUserName(),
-            signUp.getUserEmail(),
-            signUp.getRole(),
-            getToken(signUp)
-    );
-}
+    @Override
+    public AuthResponse getTokenFromSingUp(SignUpRequest signUpRequest) {
+
+        User signUp = SignUp(signUpRequest);
+        return new AuthResponse(
+                signUp.getUserId(),
+                signUp.getUserName(),
+                signUp.getUserEmail(),
+                signUp.getRole(),
+                getToken(signUp)
+        );
+    }
+
     private User toEntityFromSignUp(SignUpRequest signUpRequest) {
         return new User(
                 passwordEncoder.encode(signUpRequest.password()),
                 signUpRequest.role()
-                ,signUpRequest.userEmail()
-                ,signUpRequest.firstName()+" "+signUpRequest.lastName());
+                , signUpRequest.userEmail()
+                , signUpRequest.firstName() + " " + signUpRequest.lastName());
     }
 }
 

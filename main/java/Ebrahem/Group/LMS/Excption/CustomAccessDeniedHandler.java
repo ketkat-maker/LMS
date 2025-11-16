@@ -1,4 +1,4 @@
-package Ebrahem.Group.LMS.Controller.Excption;
+package Ebrahem.Group.LMS.Excption;
 
 import Ebrahem.Group.LMS.Model.Dtos.ApiError;
 import com.fasterxml.jackson.databind.ObjectMapper;

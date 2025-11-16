@@ -19,32 +19,35 @@ import static org.springframework.http.HttpStatus.*;
 @RequestMapping(path = "/api/v1/instructor")
 public class InstructorController {
     private final InstructorService instructorService;
+
     @Operation(summary = "Create new course by Instructor")
     @PostMapping(path = "/createCourse")
-    public ResponseEntity<CourseResponse>createCourse(@Valid @RequestBody CourseRequest course){
+    public ResponseEntity<CourseResponse> createCourse(@Valid @RequestBody CourseRequest course) {
         CourseResponse createdCourse = instructorService.CreateCourseResponse(course);
         return new ResponseEntity<>(
-               createdCourse,
+                createdCourse,
                 CREATED
         );
     }
+
     @Operation(summary = "Delete course by Instructor")
     @DeleteMapping("/deleteCourse/{id}")
-    public ResponseEntity<CourseResponse>deleteCourse(@PathVariable UUID id){
+    public ResponseEntity<CourseResponse> deleteCourse(@PathVariable UUID id) {
         CourseResponse response = instructorService.deleteCourse(id);
         return new ResponseEntity<>(
                 response,
                 ACCEPTED
         );
     }
+
     @Operation(summary = "Update course by instructor")
     @PutMapping(path = "/updateCourse/{id}")
-    public ResponseEntity<CourseResponse>updatedCourse(@PathVariable UUID id,
-                                                       @RequestBody CourseRequest request ){
+    public ResponseEntity<CourseResponse> updatedCourse(@PathVariable UUID id,
+                                                        @RequestBody CourseRequest request) {
         CourseResponse response = instructorService.updateCourse(id, request);
-return new ResponseEntity<>(
-        response,
-        OK
-);
+        return new ResponseEntity<>(
+                response,
+                OK
+        );
     }
 }

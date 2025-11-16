@@ -1,4 +1,4 @@
-package Ebrahem.Group.LMS.Controller.Excption;
+package Ebrahem.Group.LMS.Excption;
 
 import Ebrahem.Group.LMS.Model.Dtos.ApiError;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,8 +12,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 
 @Component
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {

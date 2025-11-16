@@ -15,19 +15,20 @@ import java.util.List;
 public class StudentServiceImpl implements StudentService {
     private final CourseRepository courseRepository;
     private final Utility utility;
+
     public List<CourseResponse> getAllCourses() {
         List<Course> courses = returnAllCourses();
 
-                return courses.stream().map(course->
-                       new CourseResponse(
-                               course.getInstructor().getUserId(),
-                               course.getCourseId(),
-                               course.getCourseTitle(),
-                               course.getInstructor().getUserName(),
-                               course.getCreatedAt(),
-                               course.getUpdatedAt(),
-                                utility.formatDuration(course.getCourseDuration()))
-                       ).toList();
+        return courses.stream().map(course ->
+                new CourseResponse(
+                        course.getInstructor().getUserId(),
+                        course.getCourseId(),
+                        course.getCourseTitle(),
+                        course.getInstructor().getUserName(),
+                        course.getCreatedAt(),
+                        course.getUpdatedAt(),
+                        utility.formatDuration(course.getCourseDuration()))
+        ).toList();
     }
 
     private List<Course> returnAllCourses() {

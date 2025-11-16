@@ -1,5 +1,4 @@
-package Ebrahem.Group.LMS.Controller.Excption;
-
+package Ebrahem.Group.LMS.Excption;
 
 
 public class DuplicateEntityException extends RuntimeException {

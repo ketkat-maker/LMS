@@ -15,9 +15,10 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/api/v1/student")
 public class StudentController {
-private final StudentService studentService;
+    private final StudentService studentService;
+
     @GetMapping(path = "/allCourses")
-    public ResponseEntity<List<CourseResponse>>allCoursesOnSystem(){
+    public ResponseEntity<List<CourseResponse>> allCoursesOnSystem() {
 
         List<CourseResponse> allCourses = studentService.getAllCourses();
         return new ResponseEntity<>(

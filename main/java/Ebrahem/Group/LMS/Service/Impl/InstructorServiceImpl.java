@@ -69,6 +69,7 @@ public class InstructorServiceImpl implements InstructorService {
         Course created = new Course(course.courseName(), duration, instructor);
         return courseRepository.save(created);
     }
+
     private CourseResponse buildResponse(Course course) {
         return new CourseResponse(
                 course.getInstructor().getUserId(),

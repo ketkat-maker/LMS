@@ -1,7 +1,7 @@
 package Ebrahem.Group.LMS.Configuration;
 
-import Ebrahem.Group.LMS.Controller.Excption.CustomAccessDeniedHandler;
-import Ebrahem.Group.LMS.Controller.Excption.CustomAuthenticationEntryPoint;
+import Ebrahem.Group.LMS.Excption.CustomAccessDeniedHandler;
+import Ebrahem.Group.LMS.Excption.CustomAuthenticationEntryPoint;
 import Ebrahem.Group.LMS.Repositories.UserRepository;
 import Ebrahem.Group.LMS.Security.LMSUserDetailsService;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +23,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
-import static org.springframework.http.HttpMethod.POST;
-
 @EnableWebSecurity
 @EnableMethodSecurity
 @Configuration
@@ -33,6 +31,7 @@ public class AppConfig {
 
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+
     @Bean
     public UserDetailsService userDetailsService(UserRepository userRepository) {
         return new LMSUserDetailsService(userRepository);
@@ -44,7 +43,7 @@ public class AppConfig {
             JwtAuthenticationFilter jwtAuthenticationFilter
     ) throws Exception {
         http
-                .cors(cros->cros.configure(http))
+                .cors(cros -> cros.configure(http))
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
@@ -52,13 +51,13 @@ public class AppConfig {
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html").permitAll()
-                        .requestMatchers( "/api/v1/auth/**").permitAll()
-                        .requestMatchers( "/api/v1/instructor").hasRole("INSTRUCTOR")
+                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers("/api/v1/instructor").hasRole("INSTRUCTOR")
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/v1/student/**").hasAnyRole("STUDENT","INSTRUCTOR","ADMIN")
-                        .requestMatchers("/api/v1/instructor/**").hasAnyRole("STUDENT","INSTRUCTOR")
+                        .requestMatchers("/api/v1/student/**").hasAnyRole("STUDENT", "INSTRUCTOR", "ADMIN")
+                        .requestMatchers("/api/v1/instructor/**").hasAnyRole("STUDENT", "INSTRUCTOR")
                         .anyRequest().authenticated()
-                ).exceptionHandling(e->e.
+                ).exceptionHandling(e -> e.
                         authenticationEntryPoint(customAuthenticationEntryPoint)
                         .accessDeniedHandler(customAccessDeniedHandler))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

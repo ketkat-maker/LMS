@@ -18,9 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class EnrollmentController {
     private final EnrollmentService enrollmentService;
+
     @Operation(summary = "Recorded Student in  course")
     @PostMapping//("/createCourse")
-    public ResponseEntity<Enrollment>enrollInCourse(@Valid @RequestBody EnrollmentRequest request){
+    public ResponseEntity<Enrollment> enrollInCourse(@Valid @RequestBody EnrollmentRequest request) {
         Enrollment enrollment = enrollmentService.enrollInCourse(request);
         return new ResponseEntity<>(enrollment, HttpStatus.CREATED);
     }

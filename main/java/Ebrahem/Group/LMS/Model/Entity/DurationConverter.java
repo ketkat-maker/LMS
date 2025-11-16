@@ -2,6 +2,7 @@ package Ebrahem.Group.LMS.Model.Entity;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
+
 import java.time.Duration;
 
 @Converter(autoApply = true)

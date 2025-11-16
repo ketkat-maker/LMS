@@ -1,10 +1,10 @@
 package Ebrahem.Group.LMS.Util;
 
 
-
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+
 @Component
 public class Utility {
 
@@ -32,6 +32,7 @@ public class Utility {
 
         return Duration.ofHours(hours).plusMinutes(minutes);
     }
+
     public String formatDuration(Duration duration) {
         if (duration == null) return "00h 00m";
         long hours = duration.toHours();

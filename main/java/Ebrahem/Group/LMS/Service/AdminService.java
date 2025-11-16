@@ -8,8 +8,10 @@ import java.util.UUID;
 
 
 public interface AdminService {
-    List<UserResponse> getAllStudentAndInstructor() ;
+    List<UserResponse> getAllStudentAndInstructor();
+
     void deleteStudentOrInstructor(UUID id);
-   List<UsersDto> getAllByAdmin();
+
+    List<UsersDto> getAllByAdmin();
 
 }

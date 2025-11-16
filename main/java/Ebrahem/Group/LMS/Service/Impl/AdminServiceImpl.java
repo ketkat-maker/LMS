@@ -7,8 +7,8 @@ import Ebrahem.Group.LMS.Model.Entity.User;
 import Ebrahem.Group.LMS.Model.Enums.Role;
 import Ebrahem.Group.LMS.Repositories.UserRepository;
 import Ebrahem.Group.LMS.Security.LMSUserSecurity;
-import Ebrahem.Group.LMS.Service.JwtProviderService;
 import Ebrahem.Group.LMS.Service.AdminService;
+import Ebrahem.Group.LMS.Service.JwtProviderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -26,22 +26,23 @@ public class AdminServiceImpl implements AdminService {
 
     @PreAuthorize("hasRole('ADMIN')")
     @Override
-    public List<UserResponse> getAllStudentAndInstructor()  {
+    public List<UserResponse> getAllStudentAndInstructor() {
         List<Role> roles = Arrays.asList(Role.STUDENT, Role.INSTRUCTOR);
         List<User> byRole = repository.findByRoleIn(roles);
         return toUserDtoFromEntity(byRole);
     }
 
-   @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public void deleteStudentOrInstructor(UUID id) {
-        if(id == null){
+        if (id == null) {
             throw new IllegalArgumentException("ID must by not Null");
         }
 
         repository.deleteById(id);
 
     }
+
     @PreAuthorize("hasRole('ADMIN')")
     @Override
     public List<UsersDto> getAllByAdmin() {
@@ -50,21 +51,24 @@ public class AdminServiceImpl implements AdminService {
         return users.stream().
                 map(user -> new
                         UsersDto(user.getUserId()
-                        ,user.getRole(),
+                        , user.getRole(),
                         user.getCreatedAt()
-                        ,getToken(user)))
+                        , getToken(user)))
                 .toList();
     }
+
     private String getToken(User user) {
         LMSUserSecurity userDetails = new LMSUserSecurity(user);
         return jwtProviderService.generateToken(userDetails);
     }
+
     private List<User> getUserList() {
-        if(!repository.findByRole(Role.ADMIN).equals("ADMIN")){
+        if (!repository.findByRole(Role.ADMIN).equals("ADMIN")) {
             throw new RuntimeException("You are not allowed to get all users ");
         }
         return repository.findAll();
     }
+
     private List<UserResponse> toUserDtoFromEntity(List<User> users) {
         return users.stream()
                 .map(user -> new UserResponse(

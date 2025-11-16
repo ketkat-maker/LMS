@@ -1,7 +1,9 @@
 package Ebrahem.Group.LMS.Service.Impl;
 
 import Ebrahem.Group.LMS.Service.JwtProviderService;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
@@ -16,81 +18,77 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import  io.jsonwebtoken.Jwts;
-
 import static io.jsonwebtoken.Jwts.builder;
 
 @Service
 @RequiredArgsConstructor
-public class JwtProviderServiceImpl implements JwtProviderService
- {
+public class JwtProviderServiceImpl implements JwtProviderService {
     private final UserDetailsService userDetailsService;
-
+    private final Long jwtExpiresMs = 86400000L;
     @Value("${jwt.secret}")
     private String jwtSecret;
 
-    private final Long jwtExpiresMs = 86400000L;
-     public String extractUsername(String token) {
-         return extractClaim(token, Claims::getSubject);
-     }
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
 
-     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-         final Claims claims = extractAllClaims(token);
-         return claimsResolver.apply(claims);
-     }
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
 
-     public String generateToken(UserDetails userDetails) {
-         return generateToken(new HashMap<>(), userDetails);
-     }
+    public String generateToken(UserDetails userDetails) {
+        return generateToken(new HashMap<>(), userDetails);
+    }
 
-     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-         return buildToken(extraClaims, userDetails, jwtExpiresMs);
-     }
+    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+        return buildToken(extraClaims, userDetails, jwtExpiresMs);
+    }
 
-     public long getExpirationTime() {
-         return jwtExpiresMs;
-     }
+    public long getExpirationTime() {
+        return jwtExpiresMs;
+    }
 
-     private String buildToken(
-             Map<String, Object> extraClaims,
-             UserDetails userDetails,
-             long expiration
-     ) {
-         return builder()
-                 .setClaims(extraClaims)
-                 .setSubject(userDetails.getUsername())
-                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-                 .compact();
-     }
+    private String buildToken(
+            Map<String, Object> extraClaims,
+            UserDetails userDetails,
+            long expiration
+    ) {
+        return builder()
+                .setClaims(extraClaims)
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
 
-     public boolean isTokenValid(String token, UserDetails userDetails) {
-         final String username = extractUsername(token);
-         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
-     }
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+    }
 
-     private boolean isTokenExpired(String token) {
-         return extractExpiration(token).before(new Date());
-     }
+    private boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
 
-     private Date extractExpiration(String token) {
-         return extractClaim(token, Claims::getExpiration);
-     }
+    private Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
+    }
 
-     private  Claims extractAllClaims(String token) {
-         return Jwts
-                 .parser()
-                 .verifyWith(getSignInKey())
-                 .build()
-                 .parseClaimsJws(token)
-                 .getBody();
-     }
+    private Claims extractAllClaims(String token) {
+        return Jwts
+                .parser()
+                .verifyWith(getSignInKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
 
-     private SecretKey getSignInKey() {
-         byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
-         return Keys.hmacShaKeyFor(keyBytes);
-     }
+    private SecretKey getSignInKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
 
 //    @Override
 //    public UserDetails authenticate(String email, String password) {

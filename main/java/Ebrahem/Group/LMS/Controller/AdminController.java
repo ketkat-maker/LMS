@@ -17,8 +17,9 @@ import java.util.UUID;
 @RequestMapping(path = "/api/v1/admin")
 @RequiredArgsConstructor
 public class AdminController {
-     private final AdminService adminService;
-     @Operation(summary = "Get all students And  instructors role ADMIN")
+    private final AdminService adminService;
+
+    @Operation(summary = "Get all students And  instructors role ADMIN")
     @GetMapping("/Users")
     public ResponseEntity<List<UserResponse>> getAllStudentAndInstructor() {
         List<UserResponse> allUsers = adminService.getAllStudentAndInstructor();
@@ -27,17 +28,18 @@ public class AdminController {
 
     @Operation(summary = "Delete  instructor or student by ID", description = "Requires ADMIN role")
     @DeleteMapping(path = "/{id}")
-    public ResponseEntity<String> deleteStudentOrInstructor(@PathVariable UUID id){
+    public ResponseEntity<String> deleteStudentOrInstructor(@PathVariable UUID id) {
         adminService.deleteStudentOrInstructor(id);
         return new ResponseEntity<>(
-                "UserResponse delete successfully ",HttpStatus.NO_CONTENT
+                "UserResponse delete successfully ", HttpStatus.NO_CONTENT
         );
     }
+
     @Operation(summary = "get all users include (inst and stud) ", description = "Requires ADMIN role")
     @GetMapping("/allUsers")
-    public ResponseEntity<List<UsersDto>>getAllUsers(){
+    public ResponseEntity<List<UsersDto>> getAllUsers() {
         List<UsersDto> allByAdmin = adminService.getAllByAdmin();
-        return  ResponseEntity.ok(allByAdmin);
+        return ResponseEntity.ok(allByAdmin);
 
     }
 }
