@@ -9,6 +9,7 @@ import Ebrahem.Group.LMS.Repositories.UserRepository;
 import Ebrahem.Group.LMS.Security.LMSUserSecurity;
 import Ebrahem.Group.LMS.Service.AdminService;
 import Ebrahem.Group.LMS.Service.JwtProviderService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class AdminServiceImpl implements AdminService {
 
     @PreAuthorize("hasRole('ADMIN')")
     @Override
+    @Transactional
     public List<UserResponse> getAllStudentAndInstructor() {
         List<Role> roles = Arrays.asList(Role.STUDENT, Role.INSTRUCTOR);
         List<User> byRole = repository.findByRoleIn(roles);
@@ -38,16 +40,12 @@ public class AdminServiceImpl implements AdminService {
         if (id == null) {
             throw new IllegalArgumentException("ID must by not Null");
         }
-
         repository.deleteById(id);
-
     }
-
     @PreAuthorize("hasRole('ADMIN')")
     @Override
     public List<UsersDto> getAllByAdmin() {
         List<User> users = getUserList();
-
         return users.stream().
                 map(user -> new
                         UsersDto(user.getUserId()
@@ -56,7 +54,6 @@ public class AdminServiceImpl implements AdminService {
                         , getToken(user)))
                 .toList();
     }
-
     private String getToken(User user) {
         LMSUserSecurity userDetails = new LMSUserSecurity(user);
         return jwtProviderService.generateToken(userDetails);
