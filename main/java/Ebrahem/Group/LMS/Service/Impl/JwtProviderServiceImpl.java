@@ -3,7 +3,6 @@ package Ebrahem.Group.LMS.Service.Impl;
 import Ebrahem.Group.LMS.Service.JwtProviderService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
@@ -55,14 +54,13 @@ public class JwtProviderServiceImpl implements JwtProviderService {
             long expiration
     ) {
         return builder()
-                .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .claims().add(extraClaims).and()
+                .subject(userDetails.getUsername())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(getSignInKey(), Jwts.SIG.HS256)
                 .compact();
     }
-
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
@@ -80,57 +78,11 @@ public class JwtProviderServiceImpl implements JwtProviderService {
         return Jwts
                 .parser()
                 .verifyWith(getSignInKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .build().parseSignedClaims(token)
+                .getPayload();
     }
-
     private SecretKey getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
         return Keys.hmacShaKeyFor(keyBytes);
     }
-
-//    @Override
-//    public UserDetails authenticate(String email, String password) {
-//        authenticationManager.authenticate(
-//                new UsernamePasswordAuthenticationToken(email, password)
-//        );
-//
-//        return userDetailsService.loadUserByUsername(email);
-//    }
-//
-//    @Override
-//    public String generateToken(UserDetails userDetails) {
-//        Map<String, Object> claims = new HashMap<>();
-//
-//        return Jwts.builder()
-//                .setClaims(claims)
-//                .setSubject(userDetails.getUsername())
-//                .setIssuedAt(new Date(System.currentTimeMillis()))
-//                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiresMs))
-//                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-//                .compact();
-//    }
-//
-//    @Override
-//    public UserDetails validToken(String token) {
-//            String userName = extractToken(token);
-//            return userDetailsService.loadUserByUsername(userName);
-//
-//    }
-//
-//    private String extractToken(String token){
-//        return Jwts.parser()
-//                .setSigningKey(getSigningKey())
-//                .build()
-//                .parseClaimsJws(token)
-//                .getBody()
-//                .getSubject();
-//    }
-//
-//    private Key getSigningKey() {
-//        byte[] keyBytes = jwtSecret.getBytes();
-//        return new SecretKeySpec(keyBytes, SignatureAlgorithm.HS256.getJcaName());
-//    }
-
 }
