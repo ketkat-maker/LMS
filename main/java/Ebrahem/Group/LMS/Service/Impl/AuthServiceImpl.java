@@ -8,14 +8,15 @@ import Ebrahem.Group.LMS.Model.Entity.User;
 import Ebrahem.Group.LMS.Repositories.UserRepository;
 import Ebrahem.Group.LMS.Security.LMSUserSecurity;
 import Ebrahem.Group.LMS.Service.JwtProviderService;
-import Ebrahem.Group.LMS.Service.LogService;
+import Ebrahem.Group.LMS.Service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
 @Service
 @RequiredArgsConstructor
-public class LogServiceImpl implements LogService {
+public class AuthServiceImpl implements AuthService {
 
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
@@ -59,7 +60,7 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
-    public AuthResponse getTokenFromSingUp(SignUpRequest signUpRequest) {
+    public AuthResponse getTokenFromSignUp(SignUpRequest signUpRequest) {
 
         User signUp = SignUp(signUpRequest);
         return new AuthResponse(
@@ -70,6 +71,29 @@ public class LogServiceImpl implements LogService {
                 getToken(signUp)
         );
     }
+
+    @Override
+    public AuthResponse getTokenFromReset(String newPassword, String userEmail) {
+        User user = resetPassword(newPassword, userEmail);
+        return new AuthResponse(
+                user.getUserId(),
+                user.getUserName(),
+                user.getUserEmail(),
+                user.getRole(),
+                getToken(user)
+        );
+    }
+
+    private User resetPassword(String newPassword,String userEmail) {
+        User user = repository.findByUserEmail(userEmail).orElseThrow(()->
+                new RuntimeException("User isn't exists by this email: "+userEmail));
+        if (passwordEncoder.matches(newPassword,user.getUserPassword() )) {
+            throw new IllegalArgumentException("New password cant equal old password");
+        }
+        user.setUserPassword(passwordEncoder.encode(newPassword));
+        return repository.save(user);
+    }
+
 
     private User toEntityFromSignUp(SignUpRequest signUpRequest) {
         return new User(
