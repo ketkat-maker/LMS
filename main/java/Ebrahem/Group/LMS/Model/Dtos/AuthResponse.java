@@ -10,8 +10,9 @@ public record AuthResponse(
         String fallName,
         String logInEmail,
         Role role,
-        String token
-
+        String token,
+        ٍString message
 ) {
+
 }
 
