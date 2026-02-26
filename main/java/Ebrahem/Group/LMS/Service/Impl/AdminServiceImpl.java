@@ -6,7 +6,7 @@ import Ebrahem.Group.LMS.Model.Dtos.UsersDto;
 import Ebrahem.Group.LMS.Model.Entity.User;
 import Ebrahem.Group.LMS.Model.Enums.Role;
 import Ebrahem.Group.LMS.Repositories.UserRepository;
-import Ebrahem.Group.LMS.Security.LMSUserSecurity;
+import Ebrahem.Group.LMS.Security.UserSecurity;
 import Ebrahem.Group.LMS.Service.AdminService;
 import Ebrahem.Group.LMS.Service.JwtProviderService;
 import jakarta.transaction.Transactional;
@@ -45,7 +45,7 @@ public class AdminServiceImpl implements AdminService {
     @PreAuthorize("hasRole('ADMIN')")
     @Override
     public List<UsersDto> getAllByAdmin() {
-        List<User> users = getUserList();
+        List<User>users=repository.findAll();
         return users.stream().
                 map(user -> new
                         UsersDto(user.getUserId()
@@ -55,17 +55,9 @@ public class AdminServiceImpl implements AdminService {
                 .toList();
     }
     private String getToken(User user) {
-        LMSUserSecurity userDetails = new LMSUserSecurity(user);
+        UserSecurity userDetails = new UserSecurity(user);
         return jwtProviderService.generateToken(userDetails);
     }
-
-    private List<User> getUserList() {
-        if (!repository.findByRole(Role.ADMIN).equals("ADMIN")) {
-            throw new RuntimeException("You are not allowed to get all users ");
-        }
-        return repository.findAll();
-    }
-
     private List<UserResponse> toUserDtoFromEntity(List<User> users) {
         return users.stream()
                 .map(user -> new UserResponse(
