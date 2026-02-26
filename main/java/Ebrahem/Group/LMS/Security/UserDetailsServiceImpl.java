@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-public class LMSUserDetailsService implements UserDetailsService {
+public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
 
@@ -18,7 +18,7 @@ public class LMSUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUserEmail(username).
                 orElseThrow(() -> new UsernameNotFoundException("User not foud by username:  " + username));
-        return new LMSUserSecurity(user);
+        return new UserSecurity(user);
     }
 
 }

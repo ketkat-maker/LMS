@@ -5,8 +5,8 @@ import Ebrahem.Group.LMS.Model.Dtos.CourseResponse;
 
 import java.util.UUID;
 
-public interface InstructorService {
-    CourseResponse CreateCourseResponse(CourseRequest course);
+public interface InstructorFunctionalityService {
+    CourseResponse CreateCourse(CourseRequest course);
 
     CourseResponse deleteCourse(UUID courseId);
 

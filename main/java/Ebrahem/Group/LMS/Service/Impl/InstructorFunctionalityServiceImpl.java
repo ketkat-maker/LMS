@@ -6,7 +6,7 @@ import Ebrahem.Group.LMS.Model.Entity.Course;
 import Ebrahem.Group.LMS.Model.Entity.User;
 import Ebrahem.Group.LMS.Repositories.CourseRepository;
 import Ebrahem.Group.LMS.Repositories.UserRepository;
-import Ebrahem.Group.LMS.Service.InstructorService;
+import Ebrahem.Group.LMS.Service.InstructorFunctionalityService;
 import Ebrahem.Group.LMS.Util.Utility;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -20,14 +20,14 @@ import static Ebrahem.Group.LMS.Model.Enums.Role.INSTRUCTOR;
 
 @Service
 @RequiredArgsConstructor
-public class InstructorServiceImpl implements InstructorService {
+public class InstructorFunctionalityServiceImpl implements InstructorFunctionalityService {
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
     private final Utility utility;
 
     @PreAuthorize("hasRole('INSTRUCTOR')")
     @Override
-    public CourseResponse CreateCourseResponse(CourseRequest course) {
+    public CourseResponse CreateCourse(CourseRequest course) {
         Course created = createCourse(course);
         return buildResponse(created);
     }
@@ -70,6 +70,7 @@ public class InstructorServiceImpl implements InstructorService {
         return courseRepository.save(created);
     }
 
+    // helper method to create response
     private CourseResponse buildResponse(Course course) {
         return new CourseResponse(
                 course.getInstructor().getUserId(),

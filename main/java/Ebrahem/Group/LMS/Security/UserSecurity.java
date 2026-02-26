@@ -12,7 +12,7 @@ import java.util.UUID;
 
 
 @RequiredArgsConstructor
-public class LMSUserSecurity implements UserDetails {
+public class UserSecurity implements UserDetails {
     private final User user;
 
 
