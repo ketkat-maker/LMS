@@ -44,24 +44,12 @@ public class GlobalExceptionHandler {
                 .build();
         return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
     }
-
-    @ExceptionHandler(InvalidTokenException.class)
-    public ResponseEntity<ApiError> handleInvalidToken(InvalidTokenException ex, HttpServletRequest request) {
-        ApiError error = ApiError.builder()
-                .status(HttpStatus.UNAUTHORIZED.value())
-                .message(ex.getMessage() + " InvalidTokenException")
-                .path(request.getRequestURI())
-                .timestamp(LocalDateTime.now())
-                .build();
-        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
-    }
-
     // ===== Resource & Client Errors =====
     @ExceptionHandler(DuplicateEntityException.class)
     public ResponseEntity<ApiError> handleDuplicateEntity(DuplicateEntityException ex, HttpServletRequest request) {
         ApiError error = ApiError.builder()
                 .status(HttpStatus.NOT_ACCEPTABLE.value())
-                .message(ex.getMessage())
+                .message("error from Duplicate exception  "+ex.getMessage())
                 .path(request.getRequestURI())
                 .timestamp(LocalDateTime.now())
                 .build();

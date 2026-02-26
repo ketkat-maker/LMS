@@ -2,7 +2,7 @@ package Ebrahem.Group.LMS.Configuration;
 
 
 import Ebrahem.Group.LMS.Excption.InvalidTokenException;
-import Ebrahem.Group.LMS.Security.LMSUserDetailsService;
+import Ebrahem.Group.LMS.Security.UserDetailsServiceImpl;
 import Ebrahem.Group.LMS.Service.Impl.JwtProviderServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,7 +24,7 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtProviderServiceImpl authenticateService;
-    private final LMSUserDetailsService userDetailsService;
+    private final UserDetailsServiceImpl userDetailsService;
 
     @Override
     protected void doFilterInternal(
@@ -39,67 +39,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        try {
-            final String jwt = authHeader.substring(7);
-            final String userEmail = authenticateService.extractUsername(jwt);
 
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        final String jwt = authHeader.substring(7);
+        final String userEmail = authenticateService.extractUsername(jwt);
 
-            if (userEmail != null && authentication == null) {
-                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-                if (authenticateService.isTokenValid(jwt, userDetails)) {
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.getAuthorities()
-                    );
+        if (userEmail != null && authentication == null) {
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
-                }
+            if (authenticateService.isTokenValid(jwt, userDetails)) {
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities()
+                );
+
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authToken);
             }
-
-            filterChain.doFilter(request, response);
-        } catch (Exception exception) {
-//        HandlerExceptionResolver.resolveException(request, response, null, exception);
-            throw new InvalidTokenException("invalid token");
         }
+        filterChain.doFilter(request, response);
     }
-//    @Override
-//    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-//        try {
-//            String token = extractToken(request);
-//            if (token != null) {
-//                UserDetails userDetails = authenticateService.validToken(token);
-//
-//
-//                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-//                        userDetails,
-//                        null,
-//                        userDetails.getAuthorities()
-//                );
-//                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-//
-//                if (userDetails instanceof LMSUserSecurity) {
-//                    request.setAttribute("userId", ((LMSUserSecurity) userDetails).getUserId());
-//                }
-//            }
-//        } catch (Exception e){
-//            logger.warn("Received invalid token auth");
-//        }
-//        filterChain.doFilter(request,response);
-//    }
-//
-//    private String extractToken(HttpServletRequest request)
-//    {
-//        String authentication = request.getHeader("Authentication");
-//
-//        if (authentication!=null&&authentication.startsWith("Bearer ")){
-//            return authentication.substring(7);
-//        }
-//        return null;
-//    }
-//    private final HandlerExceptionResolver HandlerExceptionResolver;
-
 }
