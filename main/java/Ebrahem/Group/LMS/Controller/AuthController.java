@@ -26,7 +26,7 @@ public class AuthController {
 private final Map<String,Bucket>buckets=new ConcurrentHashMap<>();
 
 
-    // way to limit rate of requests on server
+    // limit rate of requests on server
     private Bucket createNewBucket(String key){
     return
             buckets.computeIfAbsent(key,k->

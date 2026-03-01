@@ -3,7 +3,7 @@ package Ebrahem.Group.LMS.Controller;
 
 import Ebrahem.Group.LMS.Model.Dtos.CourseRequest;
 import Ebrahem.Group.LMS.Model.Dtos.CourseResponse;
-import Ebrahem.Group.LMS.Service.InstructorService;
+import Ebrahem.Group.LMS.Service.InstructorFunctionalityService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,12 +18,12 @@ import static org.springframework.http.HttpStatus.*;
 @RequiredArgsConstructor
 @RequestMapping(path = "/api/v1/instructor")
 public class InstructorController {
-    private final InstructorService instructorService;
+    private final InstructorFunctionalityService instructorFunctionalityService;
 
     @Operation(summary = "Create new course by Instructor")
     @PostMapping(path = "/createCourse")
     public ResponseEntity<CourseResponse> createCourse(@Valid @RequestBody CourseRequest course) {
-        CourseResponse createdCourse = instructorService.CreateCourseResponse(course);
+        CourseResponse createdCourse = instructorFunctionalityService.CreateCourse(course);
         return new ResponseEntity<>(
                 createdCourse,
                 CREATED
@@ -33,7 +33,7 @@ public class InstructorController {
     @Operation(summary = "Delete course by Instructor")
     @DeleteMapping("/deleteCourse/{id}")
     public ResponseEntity<CourseResponse> deleteCourse(@PathVariable UUID id) {
-        CourseResponse response = instructorService.deleteCourse(id);
+        CourseResponse response = instructorFunctionalityService.deleteCourse(id);
         return new ResponseEntity<>(
                 response,
                 ACCEPTED
@@ -44,7 +44,7 @@ public class InstructorController {
     @PutMapping(path = "/updateCourse/{id}")
     public ResponseEntity<CourseResponse> updatedCourse(@PathVariable UUID id,
                                                         @RequestBody CourseRequest request) {
-        CourseResponse response = instructorService.updateCourse(id, request);
+        CourseResponse response = instructorFunctionalityService.updateCourse(id, request);
         return new ResponseEntity<>(
                 response,
                 OK

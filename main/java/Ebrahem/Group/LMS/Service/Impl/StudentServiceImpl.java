@@ -4,7 +4,7 @@ import Ebrahem.Group.LMS.Model.Dtos.CourseResponse;
 import Ebrahem.Group.LMS.Model.Entity.Course;
 import Ebrahem.Group.LMS.Repositories.CourseRepository;
 import Ebrahem.Group.LMS.Service.StudentService;
-import Ebrahem.Group.LMS.Util.Utility;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,8 +14,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StudentServiceImpl implements StudentService {
     private final CourseRepository courseRepository;
-    private final Utility utility;
 
+    @Override
     public List<CourseResponse> getAllCourses() {
         List<Course> courses = returnAllCourses();
 
@@ -27,10 +27,11 @@ public class StudentServiceImpl implements StudentService {
                         course.getInstructor().getUserName(),
                         course.getCreatedAt(),
                         course.getUpdatedAt(),
-                        utility.formatDuration(course.getCourseDuration()))
+                        course.getCourseDuration())
         ).toList();
     }
 
+    @Transactional
     private List<Course> returnAllCourses() {
         return courseRepository.findAll();
     }

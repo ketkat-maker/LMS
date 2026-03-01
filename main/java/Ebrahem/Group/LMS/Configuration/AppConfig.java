@@ -3,7 +3,7 @@ package Ebrahem.Group.LMS.Configuration;
 import Ebrahem.Group.LMS.Excption.CustomAccessDeniedHandler;
 import Ebrahem.Group.LMS.Excption.CustomAuthenticationEntryPoint;
 import Ebrahem.Group.LMS.Repositories.UserRepository;
-import Ebrahem.Group.LMS.Security.LMSUserDetailsService;
+import Ebrahem.Group.LMS.Security.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,7 +34,7 @@ public class AppConfig {
 
     @Bean
     public UserDetailsService userDetailsService(UserRepository userRepository) {
-        return new LMSUserDetailsService(userRepository);
+        return new UserDetailsServiceImpl(userRepository);
     }
 
     @Bean
@@ -55,13 +55,13 @@ public class AppConfig {
                         .requestMatchers("/api/v1/instructor").hasRole("INSTRUCTOR")
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/student/**").hasAnyRole("STUDENT", "INSTRUCTOR", "ADMIN")
-                        .requestMatchers("/api/v1/instructor/**").hasAnyRole("STUDENT", "INSTRUCTOR")
+                        .requestMatchers("/api/v1/instructor/**").hasRole("INSTRUCTOR").
+                        requestMatchers("/api/v1/enrollment/**").hasAnyRole("STUDENT", "INSTRUCTOR")
                         .anyRequest().authenticated()
                 ).exceptionHandling(e -> e.
                         authenticationEntryPoint(customAuthenticationEntryPoint)
                         .accessDeniedHandler(customAccessDeniedHandler))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
 
@@ -76,7 +76,7 @@ public class AppConfig {
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider(LMSUserDetailsService userDetailsService) {
+    public AuthenticationProvider authenticationProvider(UserDetailsServiceImpl userDetailsService) {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(coder());

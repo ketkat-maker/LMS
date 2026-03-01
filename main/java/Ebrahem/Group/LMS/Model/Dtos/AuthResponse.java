@@ -11,7 +11,7 @@ public record AuthResponse(
         String logInEmail,
         Role role,
         String token,
-        ٍString message
+        String message
 ) {
 
 }

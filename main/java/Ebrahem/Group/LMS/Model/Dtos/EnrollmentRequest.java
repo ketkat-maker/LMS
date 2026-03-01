@@ -3,6 +3,8 @@ package Ebrahem.Group.LMS.Model.Dtos;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 
+import java.util.UUID;
+
 
 public record EnrollmentRequest(
         @NotBlank
@@ -10,6 +12,9 @@ public record EnrollmentRequest(
         String courseName,
         @NotBlank
         @NotEmpty(message = "Student name cannot be empty")
-        String studentName
+        String studentName,
+        UUID studentId,
+        UUID courseID
+
 ) {
 }

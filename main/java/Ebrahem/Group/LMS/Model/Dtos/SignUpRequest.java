@@ -11,9 +11,11 @@ public record SignUpRequest(
         @Email(message = "Email must be valid")
         @Size(min = 5, max = 100)
         String userEmail,
-        @Size(min = 4, message = "First must be at least 8 characters")
+        @Size(min = 4, message = "First name must be at least 8 characters")
         @NotBlank
         String firstName,
+        @Size(min = 4, message = "Last name must be at least 8 characters")
+        @NotBlank
         String lastName,
         Role role,
         @NotBlank

@@ -6,14 +6,13 @@ import Ebrahem.Group.LMS.Model.Dtos.LogInRequest;
 import Ebrahem.Group.LMS.Model.Dtos.SignUpRequest;
 import Ebrahem.Group.LMS.Model.Entity.User;
 import Ebrahem.Group.LMS.Repositories.UserRepository;
-import Ebrahem.Group.LMS.Security.LMSUserSecurity;
+import Ebrahem.Group.LMS.Security.UserSecurity;
 import Ebrahem.Group.LMS.Service.JwtProviderService;
 import Ebrahem.Group.LMS.Service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -40,11 +39,11 @@ public class AuthServiceImpl implements AuthService {
                 user.getUserName(),
                 user.getUserEmail(),
                 user.getRole(),
-                token);
+                token,null);
     }
 
     private String getToken(User user) {
-        LMSUserSecurity userDetails = new LMSUserSecurity(user);
+        UserSecurity userDetails = new UserSecurity(user);
         return jwtProviderService.generateToken(userDetails);
     }
 
@@ -68,7 +67,7 @@ public class AuthServiceImpl implements AuthService {
                 signUp.getUserName(),
                 signUp.getUserEmail(),
                 signUp.getRole(),
-                getToken(signUp)
+                getToken(signUp),null
         );
     }
 
@@ -80,7 +79,8 @@ public class AuthServiceImpl implements AuthService {
                 user.getUserName(),
                 user.getUserEmail(),
                 user.getRole(),
-                getToken(user)
+                getToken(user),
+                null
         );
     }
 

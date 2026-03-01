@@ -16,7 +16,7 @@ public class SwaggerConfig {
         final String securitySchemeName = "bearerAuth";
 
         return new OpenAPI()
-                .info(new Info().title("LMS API").version("v1"))
+                .info(new Info().title("Learning Management System (LMS) API").version("v1"))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new Components()
                         .addSecuritySchemes(securitySchemeName,

@@ -11,7 +11,7 @@ public record CourseResponse(
         String instructorName,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
-        String courseDuration
+        LocalDateTime courseDuration
 ) {
     public static CourseResponse fromEntity(UUID instructorId,
                                             UUID courseId,
@@ -19,7 +19,7 @@ public record CourseResponse(
                                             String instructorName,
                                             LocalDateTime createdAt,
                                             LocalDateTime updatedAt,
-                                            Duration duration) {
+                                            LocalDateTime duration) {
         return new CourseResponse(
                 instructorId,
                 courseId,
@@ -27,14 +27,9 @@ public record CourseResponse(
                 instructorName,
                 createdAt,
                 updatedAt,
-                formatDuration(duration)
+                duration
         );
     }
 
-    private static String formatDuration(Duration duration) {
-        if (duration == null) return "00h 00m";
-        long hours = duration.toHours();
-        long minutes = duration.toMinutesPart();
-        return String.format("%02dh %02dm", hours, minutes);
-    }
+
 }

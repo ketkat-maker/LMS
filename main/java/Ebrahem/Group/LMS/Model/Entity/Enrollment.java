@@ -52,9 +52,5 @@ public class Enrollment {
     }
 
     @PrePersist
-    private void onEnroll() {
-
-        this.enrollAt = LocalDateTime.now();
-
-    }
+    private void onEnroll() {this.enrollAt = LocalDateTime.now();}
 }
