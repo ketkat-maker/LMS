@@ -15,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -26,13 +27,15 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @PreAuthorize("hasRole('INSTRUCTOR') or hasRole('STUDENT')")
     @Override
     public Enrollment enrollInCourse(EnrollmentRequest request) {
-        String studentName = request.studentName();
-        String courseName = request.courseName();
+        UUID studentId = request.studentId();
+        UUID courseID = request.courseID();
+        String studentName= request.studentName();
+//        String courseName= request.courseName();
 
-        User existUser = userRepository.findByUserName(studentName).
-                orElseThrow(() -> new IllegalArgumentException("User does not exist by this name: " + studentName));
-        Course existsCourse = courseRepository.findByCourseTitle(courseName).
-                orElseThrow(() -> new IllegalArgumentException("course does not exist by this name: " + courseName));
+        User existUser = userRepository.findById(studentId).
+                orElseThrow(() -> new IllegalArgumentException("User does not exist by this name: " + studentId));
+        Course existsCourse = courseRepository.findById(courseID).
+                orElseThrow(() -> new IllegalArgumentException("course does not exist by this name: " + courseID));
         boolean alreadyEnrolled = enrollmentRepository.existsByUserAndCourse(
                 existUser,
                 existsCourse
@@ -47,10 +50,4 @@ public class EnrollmentServiceImpl implements EnrollmentService {
                 , LocalDateTime.now());
         return enrollmentRepository.save(savedEnroll);
     }
-//private float calculateStudentProgress(float progress){
-//        if (progress == 0.0f){
-//            return  0.0f;
-//        }
-//        return 0.0f
-//}
 }
