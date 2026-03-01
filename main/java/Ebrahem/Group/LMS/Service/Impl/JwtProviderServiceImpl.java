@@ -5,7 +5,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,18 +19,24 @@ import java.util.function.Function;
 import static io.jsonwebtoken.Jwts.builder;
 
 @Service
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class JwtProviderServiceImpl implements JwtProviderService {
     private final UserDetailsService userDetailsService;
     private final Long jwtExpiresMs = 86400000L;
-    @Value("${jwt.secret}")
-    private String jwtSecret;
+    private final String jwtSecret;
 
+    public JwtProviderServiceImpl(UserDetailsService userDetailsService,
+                                  @Value("${jwt.secret}") String jwtSecret) {
+        this.userDetailsService = userDetailsService;
+        this.jwtSecret = jwtSecret;
+    }
+
+    @Override
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
@@ -40,11 +45,11 @@ public class JwtProviderServiceImpl implements JwtProviderService {
         return generateToken(new HashMap<>(), userDetails);
     }
 
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+    private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return buildToken(extraClaims, userDetails, jwtExpiresMs);
     }
 
-    public long getExpirationTime() {
+    private long getExpirationTime() {
         return jwtExpiresMs;
     }
 
@@ -61,6 +66,8 @@ public class JwtProviderServiceImpl implements JwtProviderService {
                 .signWith(getSignInKey(), Jwts.SIG.HS256)
                 .compact();
     }
+
+    @Override
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
@@ -81,6 +88,7 @@ public class JwtProviderServiceImpl implements JwtProviderService {
                 .build().parseSignedClaims(token)
                 .getPayload();
     }
+
     private SecretKey getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
         return Keys.hmacShaKeyFor(keyBytes);
