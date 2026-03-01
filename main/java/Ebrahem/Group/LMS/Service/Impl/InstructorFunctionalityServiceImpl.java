@@ -7,13 +7,11 @@ import Ebrahem.Group.LMS.Model.Entity.User;
 import Ebrahem.Group.LMS.Repositories.CourseRepository;
 import Ebrahem.Group.LMS.Repositories.UserRepository;
 import Ebrahem.Group.LMS.Service.InstructorFunctionalityService;
-import Ebrahem.Group.LMS.Util.Utility;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
 import java.util.UUID;
 
 import static Ebrahem.Group.LMS.Model.Enums.Role.INSTRUCTOR;
@@ -23,7 +21,6 @@ import static Ebrahem.Group.LMS.Model.Enums.Role.INSTRUCTOR;
 public class InstructorFunctionalityServiceImpl implements InstructorFunctionalityService {
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
-    private final Utility utility;
 
     @PreAuthorize("hasRole('INSTRUCTOR')")
     @Override
@@ -49,7 +46,7 @@ public class InstructorFunctionalityServiceImpl implements InstructorFunctionali
                 .orElseThrow(() -> new IllegalArgumentException("Course not found by this ID: " + courseId));
 
         courseById.setCourseTitle(course.courseName());
-        courseById.setCourseDuration(utility.parseDuration(course.courseDuration()));
+        courseById.setCourseDuration(course.courseDuration());
 
         Course updatedCourse = courseRepository.save(courseById);
         return buildResponse(updatedCourse);
@@ -65,8 +62,7 @@ public class InstructorFunctionalityServiceImpl implements InstructorFunctionali
         if (courseRepository.existsByCourseTitle(course.courseName()))
             throw new IllegalArgumentException("Course already exists: " + course.courseName());
 
-        Duration duration = utility.parseDuration(course.courseDuration());
-        Course created = new Course(course.courseName(), duration, instructor);
+        Course created = new Course(course.courseName(), course.courseDuration(), instructor);
         return courseRepository.save(created);
     }
 
@@ -79,7 +75,7 @@ public class InstructorFunctionalityServiceImpl implements InstructorFunctionali
                 course.getInstructor().getUserName(),
                 course.getCreatedAt(),
                 course.getUpdatedAt(),
-                utility.formatDuration(course.getCourseDuration())
+                course.getCourseDuration()
         );
     }
 }

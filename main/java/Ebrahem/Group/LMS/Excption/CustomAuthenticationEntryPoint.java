@@ -27,7 +27,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
                 .status(HttpStatus.UNAUTHORIZED.value())
                 .message("Authentication failed or token is missing.")
                 .path(request.getRequestURI())
-                .timestamp(LocalDateTime.now())//.truncatedTo(ChronoUnit.SECONDS))
+                .timestamp(LocalDateTime.now())
                 .build();
 
         ObjectMapper mapper = new ObjectMapper();

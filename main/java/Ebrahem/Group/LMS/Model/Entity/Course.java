@@ -1,11 +1,13 @@
 package Ebrahem.Group.LMS.Model.Entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Time;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -27,10 +29,11 @@ public class Course {
     @Column(nullable = false)
     private String courseTitle;
 
-    @Convert(converter = DurationConverter.class)
-    private Duration courseDuration;
-
+    @JsonFormat(pattern = "HH:mm:ss")
+    private LocalDateTime courseDuration;
+    @Column
     private LocalDateTime createdAt;
+    @Column
     private LocalDateTime updatedAt;
 
     @ManyToOne
@@ -40,7 +43,7 @@ public class Course {
     @OneToMany(mappedBy = "course")
     private List<Enrollment> enrollments;
 
-    public Course(String courseTitle, Duration courseDuration, User instructor) {
+    public Course(String courseTitle, LocalDateTime courseDuration, User instructor) {
         this.courseTitle = courseTitle.toLowerCase();
         this.courseDuration = courseDuration;
         this.instructor = instructor;
