@@ -1,10 +1,12 @@
 package Ebrahem.Group.LMS.Model.Dtos;
 
 import Ebrahem.Group.LMS.Model.Enums.Role;
+import lombok.Builder;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Builder
 public record UserResponse(
         UUID UserId,
         String UserName,

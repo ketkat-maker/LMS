@@ -37,15 +37,16 @@ public class AdminServiceImpl implements AdminService {
     @PreAuthorize("hasRole('ADMIN')")
     @Override
     public void deleteStudentOrInstructor(UUID id) {
-        if (id == null) {
-            throw new IllegalArgumentException("ID must by not Null");
+        if (!repository.existsById(id)) {
+            throw new IllegalArgumentException("user not found by this id: " + id);
         }
         repository.deleteById(id);
     }
+
     @PreAuthorize("hasRole('ADMIN')")
     @Override
     public List<UsersDto> getAllByAdmin() {
-        List<User>users=repository.findAll();
+        List<User> users = repository.findAll();
         return users.stream().
                 map(user -> new
                         UsersDto(user.getUserId()
@@ -54,11 +55,13 @@ public class AdminServiceImpl implements AdminService {
                         , getToken(user)))
                 .toList();
     }
+
     private String getToken(User user) {
         UserSecurity userDetails = new UserSecurity(user);
         return jwtProviderService.generateToken(userDetails);
     }
-    private List<UserResponse> toUserDtoFromEntity(List<User> users) {
+
+    public List<UserResponse> toUserDtoFromEntity(List<User> users) {
         return users.stream()
                 .map(user -> new UserResponse(
                         user.getUserId(),
