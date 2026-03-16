@@ -56,4 +56,9 @@ class JwtProviderServiceImplTest {
         //then
         assertFalse(tokenValid);
     }
+
+    @Test
+    void tokenExpired() {
+
+    }
 }
