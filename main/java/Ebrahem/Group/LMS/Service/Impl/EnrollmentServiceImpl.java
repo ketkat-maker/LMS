@@ -2,6 +2,7 @@ package Ebrahem.Group.LMS.Service.Impl;
 
 import Ebrahem.Group.LMS.Excption.DuplicateEntityException;
 import Ebrahem.Group.LMS.Model.Dtos.EnrollmentRequest;
+import Ebrahem.Group.LMS.Model.Dtos.EnrollmentResponse;
 import Ebrahem.Group.LMS.Model.Entity.Course;
 import Ebrahem.Group.LMS.Model.Entity.Enrollment;
 import Ebrahem.Group.LMS.Model.Entity.User;
@@ -26,14 +27,13 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
     @PreAuthorize("hasRole('INSTRUCTOR') or hasRole('STUDENT')")
     @Override
-    public Enrollment enrollInCourse(EnrollmentRequest request) {
+    public EnrollmentResponse enrollInCourse(EnrollmentRequest request) {
         UUID studentId = request.studentId();
         UUID courseID = request.courseID();
-        String studentName= request.studentName();
-//        String courseName= request.courseName();
+        String studentName = request.studentName();
 
         User existUser = userRepository.findById(studentId).
-                orElseThrow(() -> new IllegalArgumentException("User does not exist by this name: " + studentId));
+                orElseThrow(() -> new IllegalArgumentException("User does not exist by this name: " + studentName));
         Course existsCourse = courseRepository.findById(courseID).
                 orElseThrow(() -> new IllegalArgumentException("course does not exist by this name: " + courseID));
         boolean alreadyEnrolled = enrollmentRepository.existsByUserAndCourse(
@@ -48,6 +48,31 @@ public class EnrollmentServiceImpl implements EnrollmentService {
                 , Status.ACTIVE
                 , 0.0F
                 , LocalDateTime.now());
-        return enrollmentRepository.save(savedEnroll);
+        enrollmentRepository.save(savedEnroll);
+
+        return new EnrollmentResponse(
+                existsCourse.getCourseTitle(),
+                studentName,
+                Status.ACTIVE,
+                LocalDateTime.now(),
+                0.0F
+        );
     }
+
+//    @PreAuthorize("hasRole('STUDENT')")
+//    @Override
+//    public List<EnrollmentResponse> getStudentEnrollments(UUID studentId) {
+//        if (studentId == null || enrollmentRepository.existsByUser(studentId)) {
+//            throw new RuntimeException("student doesn't have an id ");
+//        }
+//        List<Enrollment> studentEnrolments = enrollmentRepository.findByUser(studentId);
+//        return studentEnrolments.stream()
+//                .map(enrolment -> new EnrollmentResponse(
+//                        enrolment.getCourse().getCourseTitle(),
+//                        enrolment.getUser().getUserName(),
+//                        enrolment.getStatus(),
+//                        enrolment.getEnrollAt(),
+//                        enrolment.getProgress()
+//                )).toList();
+//    }
 }

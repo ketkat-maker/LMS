@@ -53,11 +53,8 @@ public class InstructorFunctionalityServiceImpl implements InstructorFunctionali
     }
 
     private Course createCourse(CourseRequest course) {
-        User instructor = userRepository.findByUserName(course.instructorName())
+        User instructor = userRepository.findByUserNameAndRole(course.instructorName(), INSTRUCTOR)
                 .orElseThrow(() -> new IllegalArgumentException("Instructor not found"));
-
-        if (instructor.getRole() != INSTRUCTOR)
-            throw new IllegalStateException("User is not an instructor");
 
         if (courseRepository.existsByCourseTitle(course.courseName()))
             throw new IllegalArgumentException("Course already exists: " + course.courseName());
