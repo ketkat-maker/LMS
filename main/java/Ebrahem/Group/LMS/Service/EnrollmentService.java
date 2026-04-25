@@ -1,9 +1,11 @@
 package Ebrahem.Group.LMS.Service;
 
 import Ebrahem.Group.LMS.Model.Dtos.EnrollmentRequest;
-import Ebrahem.Group.LMS.Model.Entity.Enrollment;
+import Ebrahem.Group.LMS.Model.Dtos.EnrollmentResponse;
 
 
 public interface EnrollmentService {
-    Enrollment enrollInCourse(EnrollmentRequest request);
+    EnrollmentResponse enrollInCourse(EnrollmentRequest request);
+
+
 }
