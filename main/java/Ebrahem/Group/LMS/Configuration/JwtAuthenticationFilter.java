@@ -1,7 +1,6 @@
 package Ebrahem.Group.LMS.Configuration;
 
 
-import Ebrahem.Group.LMS.Excption.InvalidTokenException;
 import Ebrahem.Group.LMS.Security.UserDetailsServiceImpl;
 import Ebrahem.Group.LMS.Service.Impl.JwtProviderServiceImpl;
 import jakarta.servlet.FilterChain;
