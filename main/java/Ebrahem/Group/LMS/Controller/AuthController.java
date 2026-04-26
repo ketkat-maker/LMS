@@ -5,7 +5,7 @@ import Ebrahem.Group.LMS.Model.Dtos.LogInRequest;
 import Ebrahem.Group.LMS.Model.Dtos.ResetPasswordDto;
 import Ebrahem.Group.LMS.Model.Dtos.SignUpRequest;
 import Ebrahem.Group.LMS.Service.AuthService;
-import Ebrahem.Group.LMS.Service.RateLimiterService;
+import Ebrahem.Group.LMS.Service.RateLimit.RateLimiterService;
 import io.github.bucket4j.Bucket;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
