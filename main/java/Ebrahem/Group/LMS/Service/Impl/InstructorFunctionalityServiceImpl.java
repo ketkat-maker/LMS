@@ -7,6 +7,7 @@ import Ebrahem.Group.LMS.Model.Entity.User;
 import Ebrahem.Group.LMS.Repositories.CourseRepository;
 import Ebrahem.Group.LMS.Repositories.UserRepository;
 import Ebrahem.Group.LMS.Service.InstructorFunctionalityService;
+import Ebrahem.Group.LMS.Service.Specification.CourseSpecification;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,6 +22,7 @@ import static Ebrahem.Group.LMS.Model.Enums.Role.INSTRUCTOR;
 public class InstructorFunctionalityServiceImpl implements InstructorFunctionalityService {
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
+    private final CourseSpecification specification;
 
     @PreAuthorize("hasRole('INSTRUCTOR')")
     @Override
