@@ -14,6 +14,7 @@ import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
 import static io.jsonwebtoken.Jwts.builder;
@@ -36,30 +37,35 @@ public class JwtProviderServiceImpl implements JwtProviderService {
         return extractClaim(token, Claims::getSubject);
     }
 
+    @Override
+    public String extractTokenId(String token) {
+        return extractClaim(token, Claims::getId);
+    }
+
+
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
-    public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+    public String generateToken(UserDetails userDetails, UUID tokenId) {
+        return generateToken(new HashMap<>(), userDetails, tokenId);
     }
 
-    private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        return buildToken(extraClaims, userDetails, jwtExpiresMs);
+    private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails, UUID tokenId) {
+        return buildToken(extraClaims, userDetails, jwtExpiresMs, tokenId);
     }
 
-    private long getExpirationTime() {
-        return jwtExpiresMs;
-    }
 
     private String buildToken(
             Map<String, Object> extraClaims,
             UserDetails userDetails,
-            long expiration
+            long expiration,
+            UUID tokenId
     ) {
         return builder()
                 .claims().add(extraClaims).and()
+                .claim("tokenId", tokenId.toString())
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))

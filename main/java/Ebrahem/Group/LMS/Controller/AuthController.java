@@ -2,8 +2,8 @@ package Ebrahem.Group.LMS.Controller;
 
 import Ebrahem.Group.LMS.Model.Dtos.AuthResponse;
 import Ebrahem.Group.LMS.Model.Dtos.LogInRequest;
+import Ebrahem.Group.LMS.Model.Dtos.ResetPasswordDto;
 import Ebrahem.Group.LMS.Model.Dtos.SignUpRequest;
-import Ebrahem.Group.LMS.Model.Dtos.resetPasswordDto;
 import Ebrahem.Group.LMS.Service.AuthService;
 import Ebrahem.Group.LMS.Service.RateLimiterService;
 import io.github.bucket4j.Bucket;
@@ -13,10 +13,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping(path = "/api/v1/auth")
@@ -62,7 +61,7 @@ public class AuthController {
     @Operation(summary = "Reset password")
     @PostMapping(path = "/resetPassword")
     public ResponseEntity<AuthResponse> resetPass(
-            @Valid @RequestBody resetPasswordDto resetPasswordDto
+            @Valid @RequestBody ResetPasswordDto resetPasswordDto
             , HttpServletRequest httpRequest) {
         String key = resetPasswordDto.userEmail() + "_" + httpRequest.getRemoteAddr() + "_reset";
         Bucket bucket = rateLimiterService.resolveBucket(key);
@@ -75,5 +74,12 @@ public class AuthController {
                 resetPassword,
                 HttpStatus.ACCEPTED
         );
+    }
+
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<String> logout(@PathVariable UUID userId) {
+
+        authService.LogOut(userId);
+        return new ResponseEntity<>("User Logout successfully ", HttpStatus.OK);
     }
 }

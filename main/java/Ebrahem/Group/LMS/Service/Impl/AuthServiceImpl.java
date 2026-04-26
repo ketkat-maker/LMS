@@ -4,14 +4,20 @@ package Ebrahem.Group.LMS.Service.Impl;
 import Ebrahem.Group.LMS.Model.Dtos.AuthResponse;
 import Ebrahem.Group.LMS.Model.Dtos.LogInRequest;
 import Ebrahem.Group.LMS.Model.Dtos.SignUpRequest;
+import Ebrahem.Group.LMS.Model.Entity.Token;
 import Ebrahem.Group.LMS.Model.Entity.User;
+import Ebrahem.Group.LMS.Repositories.TokenRepository;
 import Ebrahem.Group.LMS.Repositories.UserRepository;
 import Ebrahem.Group.LMS.Security.UserSecurity;
-import Ebrahem.Group.LMS.Service.JwtProviderService;
 import Ebrahem.Group.LMS.Service.AuthService;
+import Ebrahem.Group.LMS.Service.JwtProviderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +26,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProviderService jwtProviderService;
-
+    private final TokenRepository tokenRepository;
 
     @Override
     public AuthResponse LogIn(LogInRequest request) {
@@ -32,20 +38,16 @@ public class AuthServiceImpl implements AuthService {
             throw new IllegalArgumentException("Invalid password");
         }
 
-        String token = getToken(user);
+        String token = generateTokenAndSaved(user);
 
         return new AuthResponse(
                 user.getUserId(),
                 user.getUserName(),
                 user.getUserEmail(),
                 user.getRole(),
-                token,null);
+                token, null);
     }
 
-    private String getToken(User user) {
-        UserSecurity userDetails = new UserSecurity(user);
-        return jwtProviderService.generateToken(userDetails);
-    }
 
     private User SignUp(SignUpRequest signUpRequest) {
         boolean existsByUserEmail = repository.existsByUserEmail(signUpRequest.userEmail());
@@ -67,7 +69,7 @@ public class AuthServiceImpl implements AuthService {
                 signUp.getUserName(),
                 signUp.getUserEmail(),
                 signUp.getRole(),
-                getToken(signUp),null
+                generateTokenAndSaved(signUp), null
         );
     }
 
@@ -79,21 +81,57 @@ public class AuthServiceImpl implements AuthService {
                 user.getUserName(),
                 user.getUserEmail(),
                 user.getRole(),
-                getToken(user),
+                generateTokenAndSaved(user),
                 null
         );
     }
 
-    private User resetPassword(String newPassword,String userEmail) {
-        User user = repository.findByUserEmail(userEmail).orElseThrow(()->
-                new RuntimeException("User isn't exists by this email: "+userEmail));
-        if (passwordEncoder.matches(newPassword,user.getUserPassword() )) {
+    @Override
+    public void LogOut(UUID userId) {
+        if (!repository.existsById(userId)) {
+            throw new IllegalArgumentException("User not found: " + userId);
+        }
+        tokenRepository.deleteAllByUserId(userId);
+    }
+
+    private User resetPassword(String newPassword, String userEmail) {
+        User user = repository.findByUserEmail(userEmail).orElseThrow(() ->
+                new RuntimeException("User isn't exists by this email: " + userEmail));
+        if (passwordEncoder.matches(newPassword, user.getUserPassword())) {
             throw new IllegalArgumentException("New password cant equal old password");
         }
         user.setUserPassword(passwordEncoder.encode(newPassword));
         return repository.save(user);
     }
 
+    private String generateTokenAndSaved(User user) {
+        revokeAllUserTokens(user);
+
+        UserDetails userDetails = new UserSecurity(user);
+        UUID tokenId = UUID.randomUUID();
+        String jwt = jwtProviderService.generateToken(userDetails, tokenId);
+
+        Token token = Token.builder()
+                .id(tokenId)
+                .token(jwt)
+                .user(user)
+                .revoked(false)
+                .expired(false)
+                .build();
+        tokenRepository.save(token);
+
+        return jwt;
+    }
+
+    private void revokeAllUserTokens(User user) {
+        List<Token> validTokens = tokenRepository
+                .findAllByUserAndRevokedFalseAndExpiredFalse(user);
+        validTokens.forEach(t -> {
+            t.setRevoked(true);
+            t.setExpired(true);
+        });
+        tokenRepository.saveAll(validTokens);
+    }
 
     private User toEntityFromSignUp(SignUpRequest signUpRequest) {
         return new User(

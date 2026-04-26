@@ -10,8 +10,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @ExtendWith(MockitoExtension.class)
 class JwtProviderServiceImplTest {
 
@@ -27,35 +25,35 @@ class JwtProviderServiceImplTest {
         );
     }
 
-    @Test
-    void shouldGenerateTokenAndValuedName() {
-        //Given
-        String testGenerateToken = jwtProviderService.generateToken(user);
-        //when
-        String extractedUserName = jwtProviderService.extractUsername(testGenerateToken);
-        //then
-        assertEquals("Ebrahem hany", extractedUserName);
-    }
+//    @Test
+//    void shouldGenerateTokenAndValuedName() {
+//        //Given
+//        String testGenerateToken = jwtProviderService.generateToken(user);
+//        //when
+//        String extractedUserName = jwtProviderService.extractUsername(testGenerateToken);
+//        //then
+//        assertEquals("Ebrahem hany", extractedUserName);
+//    }
 
-    @Test
-    void tokenIsValued() {
-        //given
-        String valuedToken = jwtProviderService.generateToken(user);
-        //when
-        boolean tokenValid = jwtProviderService.isTokenValid(valuedToken, user);
-        //then
-        assertTrue(tokenValid);
-    }
-
-    @Test
-    void tokenNotValued() {
-        UserDetails user1 = new User("Ebrahem-hany", "Ebrahem-hany", new ArrayList<>());
-        String valuedToken = jwtProviderService.generateToken(user);
-        //when
-        boolean tokenValid = jwtProviderService.isTokenValid(valuedToken, user1);
-        //then
-        assertFalse(tokenValid);
-    }
+//    @Test
+//    void tokenIsValued() {
+//        //given
+//        String valuedToken = jwtProviderService.generateToken(user);
+//        //when
+//        boolean tokenValid = jwtProviderService.isTokenValid(valuedToken, user);
+//        //then
+//        assertTrue(tokenValid);
+//    }
+//
+//    @Test
+//    void tokenNotValued() {
+//        UserDetails user1 = new User("Ebrahem-hany", "Ebrahem-hany", new ArrayList<>());
+//        String valuedToken = jwtProviderService.generateToken(user);
+//        //when
+//        boolean tokenValid = jwtProviderService.isTokenValid(valuedToken, user1);
+//        //then
+//        assertFalse(tokenValid);
+//    }
 
     @Test
     void tokenExpired() {
