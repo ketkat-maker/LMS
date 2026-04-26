@@ -1,6 +1,5 @@
 package Ebrahem.Group.LMS.Service.Impl;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,13 +16,13 @@ class JwtProviderServiceImplTest {
     @InjectMocks
     private JwtProviderServiceImpl jwtProviderService; // this is what we will test above dependencies in tested class
 
-    @BeforeEach
-    void SetUp() {
-        jwtProviderService = new JwtProviderServiceImpl(
-                null,
-                "VGhpcy1pcy1hLXNlY3JldC1rZXktZm9yLXRlc3Rpbmc="
-        );
-    }
+//    @BeforeEach
+//    void SetUp() {
+//        jwtProviderService = new JwtProviderServiceImpl(
+//                null,
+//                "VGhpcy1pcy1hLXNlY3JldC1rZXktZm9yLXRlc3Rpbmc="
+//        );
+//    }
 
 //    @Test
 //    void shouldGenerateTokenAndValuedName() {

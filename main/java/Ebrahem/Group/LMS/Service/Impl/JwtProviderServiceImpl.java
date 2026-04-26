@@ -7,7 +7,6 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -22,13 +21,11 @@ import static io.jsonwebtoken.Jwts.builder;
 @Service
 //@RequiredArgsConstructor
 public class JwtProviderServiceImpl implements JwtProviderService {
-    private final UserDetailsService userDetailsService;
     private final Long jwtExpiresMs = 86400000L;
     private final String jwtSecret;
 
-    public JwtProviderServiceImpl(UserDetailsService userDetailsService,
-                                  @Value("${jwt.secret}") String jwtSecret) {
-        this.userDetailsService = userDetailsService;
+    public JwtProviderServiceImpl(
+            @Value("${jwt.secret}") String jwtSecret) {
         this.jwtSecret = jwtSecret;
     }
 
@@ -65,7 +62,7 @@ public class JwtProviderServiceImpl implements JwtProviderService {
     ) {
         return builder()
                 .claims().add(extraClaims).and()
-                .claim("tokenId", tokenId.toString())
+                .id(tokenId.toString())
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))
