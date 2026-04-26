@@ -2,11 +2,9 @@ package Ebrahem.Group.LMS.Service.Impl;
 
 
 import Ebrahem.Group.LMS.Model.Dtos.UserResponse;
-import Ebrahem.Group.LMS.Model.Dtos.UsersDto;
 import Ebrahem.Group.LMS.Model.Entity.User;
 import Ebrahem.Group.LMS.Model.Enums.Role;
 import Ebrahem.Group.LMS.Repositories.UserRepository;
-import Ebrahem.Group.LMS.Security.UserSecurity;
 import Ebrahem.Group.LMS.Service.AdminService;
 import Ebrahem.Group.LMS.Service.JwtProviderService;
 import jakarta.transaction.Transactional;
@@ -14,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,11 +22,11 @@ public class AdminServiceImpl implements AdminService {
     private final JwtProviderService jwtProviderService;
     private final UserRepository repository;
 
+
     @PreAuthorize("hasRole('ADMIN')")
     @Override
     @Transactional
-    public List<UserResponse> getAllStudentAndInstructor() {
-        List<Role> roles = Arrays.asList(Role.STUDENT, Role.INSTRUCTOR);
+    public List<UserResponse> getUsersByRoles(List<Role> roles) {
         List<User> byRole = repository.findByRoleIn(roles);
         return toUserDtoFromEntity(byRole);
     }
@@ -37,28 +34,10 @@ public class AdminServiceImpl implements AdminService {
     @PreAuthorize("hasRole('ADMIN')")
     @Override
     public void deleteStudentOrInstructor(UUID id) {
-        if (!repository.existsById(id)) {
-            throw new IllegalArgumentException("user not found by this id: " + id);
-        }
-        repository.deleteById(id);
-    }
+        User user = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("user not found"));
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @Override
-    public List<UsersDto> getAllByAdmin() {
-        List<User> users = repository.findAll();
-        return users.stream().
-                map(user -> new
-                        UsersDto(user.getUserId()
-                        , user.getRole(),
-                        user.getCreatedAt()
-                        , getToken(user)))
-                .toList();
-    }
-
-    private String getToken(User user) {
-        UserSecurity userDetails = new UserSecurity(user);
-        return jwtProviderService.generateToken(userDetails);
+        repository.delete(user);
     }
 
     public List<UserResponse> toUserDtoFromEntity(List<User> users) {

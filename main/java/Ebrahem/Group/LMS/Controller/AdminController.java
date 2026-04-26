@@ -1,7 +1,7 @@
 package Ebrahem.Group.LMS.Controller;
 
 import Ebrahem.Group.LMS.Model.Dtos.UserResponse;
-import Ebrahem.Group.LMS.Model.Dtos.UsersDto;
+import Ebrahem.Group.LMS.Model.Enums.Role;
 import Ebrahem.Group.LMS.Service.AdminService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +21,10 @@ public class AdminController {
 
     @Operation(summary = "Get all students And  instructors role ADMIN")
     @GetMapping("/Users")
-    public ResponseEntity<List<UserResponse>> getAllStudentAndInstructor() {
-        List<UserResponse> allUsers = adminService.getAllStudentAndInstructor();
+    public ResponseEntity<List<UserResponse>> getUserUsingRole(
+            @RequestBody List<Role> roles
+    ) {
+        List<UserResponse> allUsers = adminService.getUsersByRoles(roles);
         return ResponseEntity.ok(allUsers);
     }
 
@@ -35,11 +37,4 @@ public class AdminController {
         );
     }
 
-    @Operation(summary = "get all users include (inst and stud) ", description = "Requires ADMIN role")
-    @GetMapping("/allUsers")
-    public ResponseEntity<List<UsersDto>> getAllUsers() {
-        List<UsersDto> allByAdmin = adminService.getAllByAdmin();
-        return ResponseEntity.ok(allByAdmin);
-
-    }
 }
