@@ -1,4 +1,4 @@
-package Ebrahem.Group.LMS.Service;
+package Ebrahem.Group.LMS.Service.RateLimit;
 
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
