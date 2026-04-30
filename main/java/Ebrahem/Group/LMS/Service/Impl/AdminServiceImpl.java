@@ -13,7 +13,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
 
 @Service
@@ -33,7 +32,7 @@ public class AdminServiceImpl implements AdminService {
 
     @PreAuthorize("hasRole('ADMIN')")
     @Override
-    public void deleteStudentOrInstructor(UUID id) {
+    public void deleteStudentOrInstructor(String id) {
         User user = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("user not found"));
 

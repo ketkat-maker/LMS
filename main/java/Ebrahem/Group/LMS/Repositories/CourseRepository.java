@@ -6,11 +6,10 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-import java.util.UUID;
 
 
 @Repository
-public interface CourseRepository extends JpaRepository<Course, UUID>, JpaSpecificationExecutor<Course> {
+public interface CourseRepository extends JpaRepository<Course, String>, JpaSpecificationExecutor<Course> {
 
     boolean existsByCourseTitle(String courseName);
 

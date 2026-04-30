@@ -1,6 +1,7 @@
 package Ebrahem.Group.LMS.Model.Entity;
 
 import Ebrahem.Group.LMS.Model.Enums.Role;
+import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -13,7 +14,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -23,9 +23,9 @@ import java.util.UUID;
 @Table(name = "users")
 public class User {
 
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Id
-    private UUID userId;
+    @Column(length = 12, columnDefinition = "CHAR(12)", updatable = false, nullable = false)
+    private String userId;
 
     @Column(nullable = false)
     private String userName;
@@ -51,7 +51,7 @@ public class User {
     @JsonManagedReference
     private List<Enrollment> enrollments;
 
-    public User(UUID userId, String userEmail, String userPassword, Role role) {
+    public User(String userId, String userEmail, String userPassword, Role role) {
         this.userId = userId;
         this.userEmail = userEmail;
         this.userPassword = userPassword;
@@ -68,5 +68,9 @@ public class User {
     @PrePersist
     protected void onCreated() {
         this.createdAt = LocalDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS);
+        if (this.userId == null) {
+            char[] alphabet = "0123456789abcdefghijklmnopqrstuvwxyz".toCharArray();
+            this.userId = NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, alphabet, 12);
+        }
     }
 }

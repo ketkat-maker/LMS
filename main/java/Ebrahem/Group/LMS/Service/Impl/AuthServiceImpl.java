@@ -12,6 +12,7 @@ import Ebrahem.Group.LMS.Security.UserSecurity;
 import Ebrahem.Group.LMS.Service.AuthService;
 import Ebrahem.Group.LMS.Service.JwtProviderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -35,7 +36,7 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() -> new IllegalArgumentException("User doesn't exist by this email: " + email));
 
         if (!passwordEncoder.matches(request.logInPassword(), user.getUserPassword())) {
-            throw new IllegalArgumentException("Invalid password");
+            throw new BadCredentialsException("Invalid email ro password");
         }
 
         String token = generateTokenAndSaved(user);
@@ -45,7 +46,7 @@ public class AuthServiceImpl implements AuthService {
                 user.getUserName(),
                 user.getUserEmail(),
                 user.getRole(),
-                token, null);
+                "user log in successful");
     }
 
 
@@ -69,7 +70,7 @@ public class AuthServiceImpl implements AuthService {
                 signUp.getUserName(),
                 signUp.getUserEmail(),
                 signUp.getRole(),
-                generateTokenAndSaved(signUp), null
+                null
         );
     }
 
@@ -81,13 +82,12 @@ public class AuthServiceImpl implements AuthService {
                 user.getUserName(),
                 user.getUserEmail(),
                 user.getRole(),
-                generateTokenAndSaved(user),
                 null
         );
     }
 
     @Override
-    public void LogOut(UUID userId) {
+    public void LogOut(String userId) {
         if (!repository.existsById(userId)) {
             throw new IllegalArgumentException("User not found: " + userId);
         }

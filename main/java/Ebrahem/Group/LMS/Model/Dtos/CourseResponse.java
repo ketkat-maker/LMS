@@ -1,20 +1,18 @@
 package Ebrahem.Group.LMS.Model.Dtos;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 public record CourseResponse(
-        UUID instructorId,
-        UUID courseId,
+        String instructorId,
+        String courseId,
         String courseTitle,
         String instructorName,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
         LocalDateTime courseDuration
 ) {
-    public static CourseResponse fromEntity(UUID instructorId,
-                                            UUID courseId,
+    public static CourseResponse fromEntity(String instructorId,
+                                            String courseId,
                                             String courseTitle,
                                             String instructorName,
                                             LocalDateTime createdAt,

@@ -10,8 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
-
 import static org.springframework.http.HttpStatus.*;
 
 @RestController
@@ -32,7 +30,7 @@ public class InstructorController {
 
     @Operation(summary = "Delete course by Instructor")
     @DeleteMapping("/deleteCourse/{id}")
-    public ResponseEntity<CourseResponse> deleteCourse(@PathVariable UUID id) {
+    public ResponseEntity<CourseResponse> deleteCourse(@PathVariable String id) {
         CourseResponse response = instructorFunctionalityService.deleteCourse(id);
         return new ResponseEntity<>(
                 response,
@@ -42,7 +40,7 @@ public class InstructorController {
 
     @Operation(summary = "Update course by instructor")
     @PutMapping(path = "/updateCourse/{id}")
-    public ResponseEntity<CourseResponse> updatedCourse(@PathVariable UUID id,
+    public ResponseEntity<CourseResponse> updatedCourse(@PathVariable String id,
                                                         @RequestBody CourseRequest request) {
         CourseResponse response = instructorFunctionalityService.updateCourse(id, request);
         return new ResponseEntity<>(
