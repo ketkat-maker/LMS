@@ -15,7 +15,7 @@ public interface TokenRepository extends JpaRepository<Token, UUID> {
 
     @Modifying
     @Query("DELETE FROM Token t WHERE t.user.id = :userId")
-    void deleteAllByUserId(@Param("userId") UUID userId);
+    void deleteAllByUserId(@Param("userId") String userId);
 
 
 }

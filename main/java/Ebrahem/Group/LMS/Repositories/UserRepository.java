@@ -9,10 +9,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+
 
 @Repository
-public interface UserRepository extends JpaRepository<User, UUID> {
+public interface UserRepository extends JpaRepository<User, String> {
     boolean existsByUserEmail(String email);
 
     Optional<User> findByUserEmail(String email);
@@ -21,7 +21,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     Optional<User> findByUserName(String name);
 
-    User findByUserId(UUID name);
+    User findByUserId(String name);
 
     Optional<User> findByUserNameAndRole(@NotEmpty(message = "Instructor name cant be empty ") String userName, Role role);
 }

@@ -5,7 +5,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.UUID;
 
 public interface JwtProviderService {
-    String generateToken(UserDetails details, UUID id);
+    String generateToken(UserDetails details, UUID tokenId);
 
     String extractUsername(String token);
 

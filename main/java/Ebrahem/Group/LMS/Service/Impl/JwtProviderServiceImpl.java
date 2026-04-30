@@ -62,7 +62,7 @@ public class JwtProviderServiceImpl implements JwtProviderService {
     ) {
         return builder()
                 .claims().add(extraClaims).and()
-                .id(tokenId.toString())
+                .id(String.valueOf(tokenId))
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))
