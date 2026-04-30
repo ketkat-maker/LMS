@@ -13,8 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 import static Ebrahem.Group.LMS.Model.Enums.Role.INSTRUCTOR;
 
 @Service
@@ -33,7 +31,7 @@ public class InstructorFunctionalityServiceImpl implements InstructorFunctionali
 
     @PreAuthorize("hasRole('INSTRUCTOR')")
     @Override
-    public CourseResponse deleteCourse(UUID courseId) {
+    public CourseResponse deleteCourse(String courseId) {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new EntityNotFoundException("Course not found by Id: " + courseId));
 
@@ -43,7 +41,7 @@ public class InstructorFunctionalityServiceImpl implements InstructorFunctionali
 
     @PreAuthorize("hasRole('INSTRUCTOR')")
     @Override
-    public CourseResponse updateCourse(UUID courseId, CourseRequest course) {
+    public CourseResponse updateCourse(String courseId, CourseRequest course) {
         Course courseById = courseRepository.findById(courseId)
                 .orElseThrow(() -> new IllegalArgumentException("Course not found by this ID: " + courseId));
 

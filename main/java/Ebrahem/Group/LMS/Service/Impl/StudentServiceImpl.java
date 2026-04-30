@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -53,7 +52,7 @@ public class StudentServiceImpl implements StudentService {
 
     @PreAuthorize("hasRole('STUDENT')")
     @Override
-    public List<EnrollmentResponse> getStudentEnrollments(UUID studentId) {
+    public List<EnrollmentResponse> getStudentEnrollments(String studentId) {
         Optional<User> student = Optional.of(studentRepository.findById(studentId).orElseThrow(
                 () -> new RuntimeException("student doesn't have an id ")));
 

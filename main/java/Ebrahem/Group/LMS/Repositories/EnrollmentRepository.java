@@ -8,11 +8,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 
 @Repository
-public interface EnrollmentRepository extends JpaRepository<Enrollment, UUID> {
+public interface EnrollmentRepository extends JpaRepository<Enrollment, String> {
     boolean existsByUserAndCourse(User userId, Course courseId);
 
     List<Enrollment> findByUser(Optional<User> user);

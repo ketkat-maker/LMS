@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/enrollment")
@@ -30,7 +29,7 @@ public class EnrollmentController {
 
     @Operation(summary = "Get all Student enrollments")
     @GetMapping(path = "/{studentId}")
-    public ResponseEntity<List<EnrollmentResponse>> getStudentEnrollment(@Valid @PathVariable UUID studentId) {
+    public ResponseEntity<List<EnrollmentResponse>> getStudentEnrollment(@Valid @PathVariable String studentId) {
         List<EnrollmentResponse> studentEnrollments = studentService.getStudentEnrollments(studentId);
         return new ResponseEntity<>(studentEnrollments, HttpStatus.ACCEPTED);
     }

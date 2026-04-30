@@ -20,10 +20,7 @@ public class RateLimiterService {
 
     private Bucket createNewBucket(String key) {
 
-        Bandwidth limit = Bandwidth.classic(
-                10,
-                Refill.greedy(2, Duration.ofSeconds(1))
-        );
+        Bandwidth limit = Bandwidth.classic(5, Refill.intervally(5, Duration.ofSeconds(60)));
 
         return Bucket.builder()
                 .addLimit(limit)
