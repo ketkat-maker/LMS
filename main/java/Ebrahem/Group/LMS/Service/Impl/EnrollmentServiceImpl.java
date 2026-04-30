@@ -16,7 +16,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -28,8 +27,8 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @PreAuthorize("hasRole('INSTRUCTOR') or hasRole('STUDENT')")
     @Override
     public EnrollmentResponse enrollInCourse(EnrollmentRequest request) {
-        UUID studentId = request.studentId();
-        UUID courseID = request.courseID();
+        String studentId = request.studentId();
+        String courseID = request.courseID();
         String studentName = request.studentName();
 
         User existUser = userRepository.findById(studentId).
@@ -61,7 +60,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
 //    @PreAuthorize("hasRole('STUDENT')")
 //    @Override
-//    public List<EnrollmentResponse> getStudentEnrollments(UUID studentId) {
+//    public List<EnrollmentResponse> getStudentEnrollments(String studentId) {
 //        if (studentId == null || enrollmentRepository.existsByUser(studentId)) {
 //            throw new RuntimeException("student doesn't have an id ");
 //        }

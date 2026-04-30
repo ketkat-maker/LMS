@@ -8,7 +8,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 
 @RequiredArgsConstructor
@@ -52,7 +51,7 @@ public class UserSecurity implements UserDetails {
         return true;
     }
 
-    public UUID getUserId() {
+    public String getUserId() {
         return user.getUserId();
     }
 }

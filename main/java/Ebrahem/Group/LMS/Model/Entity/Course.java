@@ -1,5 +1,6 @@
 package Ebrahem.Group.LMS.Model.Entity;
 
+import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,13 +8,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Time;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -23,8 +21,8 @@ import java.util.UUID;
 @Table(name = "courses")
 public class Course {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID courseId;
+    @Column(length = 12, columnDefinition = "CHAR(12)", updatable = false, nullable = false)
+    private String courseId;
 
     @Column(nullable = false)
     private String courseTitle;
@@ -51,8 +49,13 @@ public class Course {
 
     @PrePersist
     void createdAt() {
+        if (this.courseId == null) {
+            char[] alphabet = "0123456789abcdefghijklmnopqrstuvwxyz".toCharArray();
+            this.courseId = NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, alphabet, 12);
+        }
         this.createdAt = LocalDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS);
         this.updatedAt = LocalDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS);
+
     }
 
     @PreUpdate

@@ -1,6 +1,7 @@
 package Ebrahem.Group.LMS.Model.Entity;
 
 import Ebrahem.Group.LMS.Model.Enums.Status;
+import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -9,7 +10,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -20,9 +20,8 @@ import java.util.UUID;
 public class Enrollment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID enrollmentId;
-
+    @Column(length = 12, columnDefinition = "CHAR(12)", updatable = false, nullable = false)
+    private String enrollmentId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     @JsonBackReference
@@ -52,5 +51,11 @@ public class Enrollment {
     }
 
     @PrePersist
-    private void onEnroll() {this.enrollAt = LocalDateTime.now();}
+    private void onEnroll() {
+        if (this.enrollmentId == null) {
+            char[] alphabet = "0123456789abcdefghijklmnopqrstuvwxyz".toCharArray();
+            this.enrollmentId = NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, alphabet, 12);
+            this.enrollAt = LocalDateTime.now();
+        }
+    }
 }
