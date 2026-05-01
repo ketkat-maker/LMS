@@ -1,62 +1,20 @@
-### General & Maven ###
-HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+# 1. تجاهل كل شيء في المجلد الرئيسي افتراضياً
+/*
 
-### Spring Boot Backend ###
-# تجاهل مجلد الاختبارات بالكامل داخل src
+# 2. استثناء المجلدات التي تريد رفعها فقط
+!src/
+!GLM-front/
+!.gitignore
+
+# 3. داخل مجلد src: تجاهل مجلد test
 src/test/
 
-### Frontend (GLM-front) ###
-# أولاً: منع تجاهل المجلد نفسه ليظهر في Git
-!GLM-front/
+# 4. داخل مجلد GLM-front: استثناء الملفات الضرورية فقط
+# (بما أننا تجاهلنا كل شيء في البداية، نحتاج لاستثناء محتويات الفولدر)
+!GLM-front/**
 
-# ثانياً: تجاهل كل شيء داخل المجلد افتراضياً
-GLM-front/*
-
-# ثالثاً: استثناء الملفات والمجلدات البرمجية التي تريد رفعها
-!GLM-front/package.json
-!GLM-front/package-lock.json
-!GLM-front/next.config.js
-!GLM-front/tsconfig.json
-!GLM-front/public/
-!GLM-front/pages/
-!GLM-front/app/
-!GLM-front/components/
-!GLM-front/styles/
-!GLM-front/lib/
-
-### IDEs Settings ###
-
-## STS (Spring Tool Suite)
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-## IntelliJ IDEA
-.idea
-*.iws
-*.iml
-*.ipr
-
-## NetBeans
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-## VS Code
-.vscode/
-
-### Secrets & Security ###
-.env
+# 5. تجاهل ملفات النظام والمكتبات داخل GLM-front (اختياري ولكن مهم)
+GLM-front/node_modules/
+GLM-front/.next/
+GLM-front/out/
+GLM-front/build/
