@@ -27,6 +27,7 @@ public class User {
     @Column(length = 12, columnDefinition = "CHAR(12)", updatable = false, nullable = false)
     private String userId;
 
+
     @Column(nullable = false)
     private String userName;
 
