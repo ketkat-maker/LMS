@@ -11,5 +11,5 @@ public interface AuthService {
 
     AuthResponse getTokenFromReset(String newPassword, String userEmail);
 
-    void LogOut(String userId);
+    void LogOut();
 }
