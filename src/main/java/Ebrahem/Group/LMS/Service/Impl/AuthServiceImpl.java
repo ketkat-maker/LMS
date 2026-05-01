@@ -13,6 +13,8 @@ import Ebrahem.Group.LMS.Service.AuthService;
 import Ebrahem.Group.LMS.Service.JwtProviderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -46,6 +48,7 @@ public class AuthServiceImpl implements AuthService {
                 user.getUserName(),
                 user.getUserEmail(),
                 user.getRole(),
+                token,
                 "user log in successful");
     }
 
@@ -70,6 +73,8 @@ public class AuthServiceImpl implements AuthService {
                 signUp.getUserName(),
                 signUp.getUserEmail(),
                 signUp.getRole(),
+                generateTokenAndSaved(signUp)
+                ,
                 null
         );
     }
@@ -82,15 +87,20 @@ public class AuthServiceImpl implements AuthService {
                 user.getUserName(),
                 user.getUserEmail(),
                 user.getRole(),
+                generateTokenAndSaved(user)
+                ,
                 null
         );
     }
 
     @Override
-    public void LogOut(String userId) {
-        if (!repository.existsById(userId)) {
-            throw new IllegalArgumentException("User not found: " + userId);
+    public void LogOut() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("User not logged in");
         }
+        UserSecurity principal = (UserSecurity) authentication.getPrincipal();
+        String userId = principal.getUserId();
         tokenRepository.deleteAllByUserId(userId);
     }
 

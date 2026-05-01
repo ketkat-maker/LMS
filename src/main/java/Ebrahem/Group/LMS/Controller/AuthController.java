@@ -31,7 +31,7 @@ public class AuthController {
         Bucket bucket = rateLimiterService.resolveBucket(key);
         if (!bucket.tryConsume(1)) {
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).
-                    body(new AuthResponse(null, null, null, null, "Too many requests. Try again later. "));
+                    body(new AuthResponse(null, null, null, null, null, "Too many requests. Try again later. "));
         }
         AuthResponse response = authService.LogIn(request);
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -48,7 +48,7 @@ public class AuthController {
         Bucket bucket = rateLimiterService.resolveBucket(key);
         if (!bucket.tryConsume(1)) {
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).
-                    body(new AuthResponse(null, null, null, null, "Too many requests. Try again later. "));
+                    body(new AuthResponse(null, null, null, null, null, "Too many requests. Try again later. "));
         }
         AuthResponse response = authService.getTokenFromSignUp(request);
         return new ResponseEntity<>(
@@ -65,7 +65,7 @@ public class AuthController {
         Bucket bucket = rateLimiterService.resolveBucket(key);
         if (!bucket.tryConsume(1)) {
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
-                    .body(new AuthResponse(null, null, null, null, "Too many requests. Try again later."));
+                    .body(new AuthResponse(null, null, null, null, null, "Too many requests. Try again later."));
         }
         AuthResponse resetPassword = authService.getTokenFromReset(resetPasswordDto.newPassword(), resetPasswordDto.userEmail());
         return new ResponseEntity<>(
@@ -74,10 +74,10 @@ public class AuthController {
         );
     }
 
-    @DeleteMapping("/{userId}")
-    public ResponseEntity<String> logout(@PathVariable String userId) {
+    @DeleteMapping("/logout")
+    public ResponseEntity<String> logout() {
 
-        authService.LogOut(userId);
+        authService.LogOut();
         return new ResponseEntity<>("User Logout successfully ", HttpStatus.OK);
     }
 }
