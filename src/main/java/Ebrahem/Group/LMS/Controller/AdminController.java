@@ -29,10 +29,10 @@ public class AdminController {
 
     @Operation(summary = "Delete  instructor or student by ID", description = "Requires ADMIN role")
     @DeleteMapping(path = "/{id}")
-    public ResponseEntity<String> deleteStudentOrInstructor(@PathVariable String id) {
-        adminService.deleteStudentOrInstructor(id);
+    public ResponseEntity<String> deleteUser(@PathVariable String id) {
+        adminService.deleteUser(id);
         return new ResponseEntity<>(
-                "UserResponse delete successfully ", HttpStatus.NO_CONTENT
+                "User delete successfully ", HttpStatus.NO_CONTENT
         );
     }
 
