@@ -9,7 +9,7 @@ import java.util.List;
 public interface AdminService {
     List<UserResponse> getUsersByRoles(List<Role> roles);
 
-    void deleteStudentOrInstructor(String id);
+    void deleteUser(String id);
 
 
 }
