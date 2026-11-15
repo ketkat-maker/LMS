@@ -1,17 +1,22 @@
 package Ebrahem.Group.LMS.Service.Impl;
 
 
-import Ebrahem.Group.LMS.Model.Dtos.AuthResponse;
-import Ebrahem.Group.LMS.Model.Dtos.LogInRequest;
-import Ebrahem.Group.LMS.Model.Dtos.SignUpRequest;
+import Ebrahem.Group.LMS.Model.Dtos.*;
 import Ebrahem.Group.LMS.Model.Entity.Token;
 import Ebrahem.Group.LMS.Model.Entity.User;
+import Ebrahem.Group.LMS.Model.Enums.OtpStatus;
+import Ebrahem.Group.LMS.Model.Enums.Role;
 import Ebrahem.Group.LMS.Repositories.TokenRepository;
 import Ebrahem.Group.LMS.Repositories.UserRepository;
 import Ebrahem.Group.LMS.Security.UserSecurity;
 import Ebrahem.Group.LMS.Service.AuthService;
 import Ebrahem.Group.LMS.Service.JwtProviderService;
+import Ebrahem.Group.LMS.Service.MailService;
+import Ebrahem.Group.LMS.Service.OtpService;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,30 +24,53 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-    private final UserRepository repository;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProviderService jwtProviderService;
     private final TokenRepository tokenRepository;
+    private final OtpService otpService;
+    private final MailService mailService;
 
     @Override
-    public AuthResponse LogIn(LogInRequest request) {
+    public String logIn(LogInRequest request) {
+        log.info("Attempting to log in user with email: {}", request.logInEmail());
         String email = request.logInEmail();
-        User user = repository.findByUserEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("User doesn't exist by this email: " + email));
-
+        User user = userRepository.findByUserEmail(email)
+                .orElseThrow(() -> new BadCredentialsException("User doesn't exist by this email: " + email));
         if (!passwordEncoder.matches(request.logInPassword(), user.getUserPassword())) {
             throw new BadCredentialsException("Invalid email ro password");
         }
+        String generateOtp = otpService.generateOtp(email);
+        log.info("Generated OTP for user with email: {}", email);
+        mailService.sendEmail(new EmailServiceDto(
+                email,
+                "OTP Verification",
+                "Your OTP is: " + generateOtp
+        ));
+        log.info("OTP sent to user with email: {}", email);
+        return "OTP sent to your email. Please check your inbox.";
+    }
 
+    public AuthResponse verifyLogInOtp(String email, String otp) {
+        log.info("Verifying login OTP for user with email: {}", email);
+        if (email == null || otp == null) {
+            throw new BadCredentialsException("Invalid email or OTP");
+        }
+        boolean isValidOtp = otpService.validateOtp(email, otp);
+        if (!isValidOtp) {
+            throw new BadCredentialsException("Invalid OTP");
+        }
+        User user = userRepository.findByUserEmail(email).orElseThrow();
+        log.info("Login OTP verified for user with email: {}", email);
         String token = generateTokenAndSaved(user);
-
         return new AuthResponse(
                 user.getUserId(),
                 user.getUserName(),
@@ -53,31 +81,87 @@ public class AuthServiceImpl implements AuthService {
     }
 
 
-    private User SignUp(SignUpRequest signUpRequest) {
-        boolean existsByUserEmail = repository.existsByUserEmail(signUpRequest.userEmail());
-
-        if (existsByUserEmail) {
-            throw new IllegalArgumentException("User already exist");
-        }
-        User entityFromSignUp = toEntityFromSignUp(signUpRequest);
-
-        return repository.save(entityFromSignUp);
-    }
-
     @Override
-    public AuthResponse getTokenFromSignUp(SignUpRequest signUpRequest) {
+    public String signUpViaEmail(String userEmail) {
+        boolean userExists = userRepository.existsByUserEmail(userEmail);
+        if (userExists) {
+            throw new BadCredentialsException("User already exists by this email: " + userEmail);
+        }
 
-        User signUp = SignUp(signUpRequest);
-        return new AuthResponse(
-                signUp.getUserId(),
-                signUp.getUserName(),
-                signUp.getUserEmail(),
-                signUp.getRole(),
-                generateTokenAndSaved(signUp)
-                ,
-                null
-        );
+        userRepository.save(new User(
+                "pending user",
+                userEmail,
+                "test user",
+                Role.STUDENT,
+                OtpStatus.PENDING,
+                LocalDateTime.now()
+
+        ));
+
+        String generateOtp = otpService.generateOtp(userEmail);
+        mailService.sendEmail(new EmailServiceDto(
+                userEmail,
+                "OTP Verification",
+                "Your OTP is: " + generateOtp
+        ));
+        return "OTP sent to your email. Please check your inbox.";
     }
+
+    @Transactional
+    @Override
+    public String verifySignUpOtp(ReceiveEmailResponse receiveEmailResponse) {
+        String email = receiveEmailResponse.UserEmail();
+        String otp = receiveEmailResponse.Otp();
+        log.info("Verifying sign-up OTP for user with email: {}", email);
+
+        if (email == null || otp == null) {
+            throw new BadCredentialsException("Invalid email or OTP");
+        }
+        User user = userRepository.findByUserEmail(email).
+                orElseThrow(() -> new BadCredentialsException("not found user by this email: " + email));
+
+        boolean isValidOtp = otpService.validateOtp(email, otp);
+        if (!isValidOtp) {
+            throw new BadCredentialsException("Invalid OTP");
+        }
+        log.info("Opt before update:{}", user.getOtpStatus());
+        user.setOtpStatus(OtpStatus.TRUEOTP);
+        user.setVerifiedAt(LocalDateTime.now());
+        log.info("Otp after update:{}", user.getOtpStatus());
+        log.info("Sign-up OTP verified for user with email: {}", email);
+        return "OTP verified successfully. You can now complete the sign-up process.";
+
+    }
+
+    @Transactional
+    @Override
+    public AuthResponse completeSignUp(SignUpRequest signUpRequest) {
+        String userEmail = signUpRequest.userEmail();
+        User user = userRepository.findByUserEmailWithLock(userEmail)
+                .orElseThrow(() ->
+                        new BadCredentialsException("User does not exist by this email: " + userEmail));
+        log.info("otp status from complete signup :{}", user.getOtpStatus());
+        if (user.getOtpStatus() != (OtpStatus.TRUEOTP) || LocalDateTime.now().isAfter(user.getVerifiedAt().plusMinutes(10))) {
+            throw new BadCredentialsException("Invalid user authentication. Please verify your email first.");
+        }
+
+
+        user.setOtpStatus(OtpStatus.COMPLETE);
+        user.setUserPassword(passwordEncoder.encode(signUpRequest.password()));
+        user.setUserName(signUpRequest.firstName() + " " + signUpRequest.lastName());
+        user.setRole(signUpRequest.role());
+
+        String token = generateTokenAndSaved(user);
+        return new AuthResponse(
+                user.getUserId(),
+                user.getUserName(),
+                userEmail,
+                user.getRole(),
+                token,
+                "user sign up successful");
+
+    }
+
 
     @Override
     public AuthResponse getTokenFromReset(String newPassword, String userEmail) {
@@ -94,7 +178,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void LogOut() {
+    public void logOut() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new RuntimeException("User not logged in");
@@ -105,24 +189,22 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private User resetPassword(String newPassword, String userEmail) {
-        User user = repository.findByUserEmail(userEmail).orElseThrow(() ->
-                new RuntimeException("User isn't exists by this email: " + userEmail));
+        User user = userRepository.findByUserEmail(userEmail).orElseThrow(() ->
+                new EntityNotFoundException("User isn't exists by this email: " + userEmail));
         if (passwordEncoder.matches(newPassword, user.getUserPassword())) {
             throw new IllegalArgumentException("New password cant equal old password");
         }
         user.setUserPassword(passwordEncoder.encode(newPassword));
-        return repository.save(user);
+        return userRepository.save(user);
     }
 
     private String generateTokenAndSaved(User user) {
         revokeAllUserTokens(user);
 
         UserDetails userDetails = new UserSecurity(user);
-        UUID tokenId = UUID.randomUUID();
-        String jwt = jwtProviderService.generateToken(userDetails, tokenId);
+        String jwt = jwtProviderService.generateToken(userDetails);
 
         Token token = Token.builder()
-                .id(tokenId)
                 .token(jwt)
                 .user(user)
                 .revoked(false)
@@ -143,13 +225,6 @@ public class AuthServiceImpl implements AuthService {
         tokenRepository.saveAll(validTokens);
     }
 
-    private User toEntityFromSignUp(SignUpRequest signUpRequest) {
-        return new User(
-                passwordEncoder.encode(signUpRequest.password()),
-                signUpRequest.role()
-                , signUpRequest.userEmail()
-                , signUpRequest.firstName() + " " + signUpRequest.lastName());
-    }
 }
 
 

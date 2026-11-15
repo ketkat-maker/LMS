@@ -1,5 +1,6 @@
 package Ebrahem.Group.LMS.Model.Entity;
 
+import Ebrahem.Group.LMS.Model.Enums.OtpStatus;
 import Ebrahem.Group.LMS.Model.Enums.Role;
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -40,30 +41,29 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OtpStatus otpStatus;
+
+    @Column(nullable = false)
+    private LocalDateTime verifiedAt;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
-
     @OneToMany(mappedBy = "instructor", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Course> courses;
-
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<Enrollment> enrollments;
 
-    public User(String userId, String userEmail, String userPassword, Role role) {
-        this.userId = userId;
+    public User(String userName, String userEmail, String userPassword, Role role, OtpStatus otpStatus, LocalDateTime verifiedAt) {
+        this.userName = userName;
         this.userEmail = userEmail;
         this.userPassword = userPassword;
         this.role = role;
-    }
-
-    public User(String userPassword, Role role, String userEmail, String userName) {
-        if (userEmail != null) this.userEmail = userEmail.toLowerCase();
-        if (userName != null) this.userName = userName.toLowerCase();
-        this.userPassword = userPassword;
-        this.role = role;
+        this.otpStatus = otpStatus;
+        this.verifiedAt = verifiedAt;
     }
 
     @PrePersist

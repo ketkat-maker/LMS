@@ -1,9 +1,6 @@
 package Ebrahem.Group.LMS.Controller;
 
-import Ebrahem.Group.LMS.Model.Dtos.AuthResponse;
-import Ebrahem.Group.LMS.Model.Dtos.LogInRequest;
-import Ebrahem.Group.LMS.Model.Dtos.ResetPasswordDto;
-import Ebrahem.Group.LMS.Model.Dtos.SignUpRequest;
+import Ebrahem.Group.LMS.Model.Dtos.*;
 import Ebrahem.Group.LMS.Service.AuthService;
 import Ebrahem.Group.LMS.Service.RateLimit.RateLimiterService;
 import io.github.bucket4j.Bucket;
@@ -24,41 +21,59 @@ public class AuthController {
 
     @Operation(summary = "You already have Account ")
     @PostMapping(path = "/login")
-    public ResponseEntity<AuthResponse> logIn(@Valid @RequestBody LogInRequest request,
-                                              HttpServletRequest httpRequest
+    public ResponseEntity<String> logIn(@Valid @RequestBody LogInRequest request,
+                                        HttpServletRequest httpRequest
     ) {
         String key = request.logInEmail() + "_" + httpRequest.getRemoteAddr() + "_login";
         Bucket bucket = rateLimiterService.resolveBucket(key);
         if (!bucket.tryConsume(1)) {
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).
-                    body(new AuthResponse(null, null, null, null, null, "Too many requests. Try again later. "));
+                    body("Too many requests. Try again later. ");
         }
-        AuthResponse response = authService.LogIn(request);
+        String response = authService.logIn(request);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @PostMapping(path = "/verifyLoginOtp")
+    public ResponseEntity<AuthResponse> verifyLoginOtp(@RequestBody ReceiveEmailResponse receiveEmailResponse) {
+        AuthResponse authResponse = authService.verifyLogInOtp(receiveEmailResponse.UserEmail(), receiveEmailResponse.Otp());
+        return ResponseEntity.status(HttpStatus.OK).body(authResponse);
+    }
+
     @Operation(summary = "You don't have account yet")
-    @PostMapping(path = "/sign")
-    public ResponseEntity<AuthResponse> register(
-            @Valid @RequestBody SignUpRequest request,
+    @PostMapping(path = "/sign-up/via-email")
+    public ResponseEntity<String> signUpVerifyEmail(
+            @Valid @RequestParam String emailRequest,
             HttpServletRequest httpRequest
     ) {
-        String key = request.userEmail() + "_" + httpRequest.getRemoteAddr() + "_signup";
+        String key = emailRequest + "_" + httpRequest.getRemoteAddr() + "_signup";
 
         Bucket bucket = rateLimiterService.resolveBucket(key);
         if (!bucket.tryConsume(1)) {
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).
-                    body(new AuthResponse(null, null, null, null, null, "Too many requests. Try again later. "));
+                    body("Too many requests. Try again later. ");
         }
-        AuthResponse response = authService.getTokenFromSignUp(request);
-        return new ResponseEntity<>(
-                response, HttpStatus.CREATED
-        );
+        String response = authService.signUpViaEmail(emailRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    @PostMapping(path = "/sign-up/verifyOtp")
+    public ResponseEntity<String> verifySignUpOtp(@RequestBody ReceiveEmailResponse receiveEmailResponse) {
+        String authResponse = authService.verifySignUpOtp(receiveEmailResponse);
+        return ResponseEntity.status(HttpStatus.OK).body(authResponse);
+    }
+
+    @PostMapping(path = "/sign-up/complete")
+    public ResponseEntity<AuthResponse> completeSignUp(@RequestBody SignUpRequest signUpRequest) {
+        AuthResponse completeSignUp = authService.completeSignUp(signUpRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(completeSignUp);
+
+    }
+
 
     @Operation(summary = "Reset password")
     @PostMapping(path = "/resetPassword")
-    public ResponseEntity<AuthResponse> resetPass(
+    public ResponseEntity<AuthResponse> resetPassword(
             @Valid @RequestBody ResetPasswordDto resetPasswordDto
             , HttpServletRequest httpRequest) {
         String key = resetPasswordDto.userEmail() + "_" + httpRequest.getRemoteAddr() + "_reset";
@@ -68,16 +83,13 @@ public class AuthController {
                     .body(new AuthResponse(null, null, null, null, null, "Too many requests. Try again later."));
         }
         AuthResponse resetPassword = authService.getTokenFromReset(resetPasswordDto.newPassword(), resetPasswordDto.userEmail());
-        return new ResponseEntity<>(
-                resetPassword,
-                HttpStatus.ACCEPTED
-        );
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(resetPassword);
     }
 
     @DeleteMapping("/logout")
     public ResponseEntity<String> logout() {
 
-        authService.LogOut();
-        return new ResponseEntity<>("User Logout successfully ", HttpStatus.OK);
+        authService.logOut();
+        return ResponseEntity.status(HttpStatus.OK).body("User Logout successfully ");
     }
 }
