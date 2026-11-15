@@ -137,9 +137,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthResponse completeSignUp(SignUpRequest signUpRequest) {
         String userEmail = signUpRequest.userEmail();
-        User user = userRepository.findByUserEmailWithLock(userEmail)
-                .orElseThrow(() ->
-                        new BadCredentialsException("User does not exist by this email: " + userEmail));
+        User user = userRepository.findByUserEmailWithLock(userEmail).orElseThrow(
+                () -> new EntityNotFoundException("User isn't exists by this email: " + userEmail));
         log.info("otp status from complete signup :{}", user.getOtpStatus());
         if (user.getOtpStatus() != (OtpStatus.TRUEOTP) || LocalDateTime.now().isAfter(user.getVerifiedAt().plusMinutes(10))) {
             throw new BadCredentialsException("Invalid user authentication. Please verify your email first.");
