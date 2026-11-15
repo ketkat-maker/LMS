@@ -7,7 +7,7 @@ import Ebrahem.Group.LMS.Model.Enums.Role;
 import Ebrahem.Group.LMS.Repositories.UserRepository;
 import Ebrahem.Group.LMS.Service.AdminService;
 import Ebrahem.Group.LMS.Service.JwtProviderService;
-import jakarta.transaction.Transactional;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -24,23 +24,9 @@ public class AdminServiceImpl implements AdminService {
 
     @PreAuthorize("hasRole('ADMIN')")
     @Override
-    @Transactional
     public List<UserResponse> getUsersByRoles(List<Role> roles) {
-        List<User> byRole = repository.findByRoleIn(roles);
-        return toUserDtoFromEntity(byRole);
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @Override
-    public void deleteStudentOrInstructor(String id) {
-        User user = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("user not found"));
-
-        repository.delete(user);
-    }
-
-    public List<UserResponse> toUserDtoFromEntity(List<User> users) {
-        return users.stream()
+        List<User> usersByRole = repository.findByRoleIn(roles);
+        return usersByRole.stream()
                 .map(user -> new UserResponse(
                         user.getUserId(),
                         user.getUserName(),
@@ -50,5 +36,15 @@ public class AdminServiceImpl implements AdminService {
                 ))
                 .toList();
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Override
+    public void deleteUser(String id) {
+        User user = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("user doesn't exist by this id: " + id));
+
+        repository.delete(user);
+    }
+
 
 }

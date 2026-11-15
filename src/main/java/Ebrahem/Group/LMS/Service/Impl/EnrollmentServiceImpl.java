@@ -11,6 +11,7 @@ import Ebrahem.Group.LMS.Repositories.CourseRepository;
 import Ebrahem.Group.LMS.Repositories.EnrollmentRepository;
 import Ebrahem.Group.LMS.Repositories.UserRepository;
 import Ebrahem.Group.LMS.Service.EnrollmentService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -24,8 +25,9 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
 
-    @PreAuthorize("hasRole('INSTRUCTOR') or hasRole('STUDENT')")
+    @PreAuthorize("hasRole('STUDENT')")
     @Override
+    @Transactional
     public EnrollmentResponse enrollInCourse(EnrollmentRequest request) {
         String studentId = request.studentId();
         String courseID = request.courseID();

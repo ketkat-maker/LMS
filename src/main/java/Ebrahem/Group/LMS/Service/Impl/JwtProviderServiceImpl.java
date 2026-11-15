@@ -13,7 +13,6 @@ import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.function.Function;
 
 import static io.jsonwebtoken.Jwts.builder;
@@ -45,24 +44,22 @@ public class JwtProviderServiceImpl implements JwtProviderService {
         return claimsResolver.apply(claims);
     }
 
-    public String generateToken(UserDetails userDetails, UUID tokenId) {
-        return generateToken(new HashMap<>(), userDetails, tokenId);
+    public String generateToken(UserDetails userDetails) {
+        return generateToken(new HashMap<>(), userDetails);
     }
 
-    private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails, UUID tokenId) {
-        return buildToken(extraClaims, userDetails, jwtExpiresMs, tokenId);
+    private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+        return buildToken(extraClaims, userDetails, jwtExpiresMs);
     }
 
 
     private String buildToken(
             Map<String, Object> extraClaims,
             UserDetails userDetails,
-            long expiration,
-            UUID tokenId
+            long expiration
     ) {
         return builder()
                 .claims().add(extraClaims).and()
-                .id(String.valueOf(tokenId))
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))

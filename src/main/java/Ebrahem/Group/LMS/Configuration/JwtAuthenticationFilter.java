@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @Component
@@ -53,7 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (authenticateService.isTokenValid(jwt, userDetails)) {
                 String tokenId = authenticateService.extractTokenId(jwt);
 
-                boolean isValidInDb = tokenRepository.findById(UUID.fromString(tokenId))
+                boolean isValidInDb = tokenRepository.findById(tokenId)
                         .map(t -> !t.isRevoked() && !t.isExpired())
                         .orElse(false);
 
