@@ -33,6 +33,11 @@ public class AppConfig {
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Bean
+    public static PasswordEncoder coder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+
+    @Bean
     public UserDetailsService userDetailsService(UserRepository userRepository) {
         return new UserDetailsServiceImpl(userRepository);
     }
@@ -43,32 +48,30 @@ public class AppConfig {
             JwtAuthenticationFilter jwtAuthenticationFilter
     ) throws Exception {
         http
-                .cors(cros -> cros.configure(http))
+                .cors(AbstractHttpConfigurer::disable) // يمكنك تعطيل CORS تماماً طالما لا يوجد فرونت إند
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // 1. السماح لمسارات Swagger بالعمل بدون توثيق
                         .requestMatchers(
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
-                                "/swagger-ui.html", " http://localhost:3000").permitAll()
+                                "/swagger-ui.html"
+                        ).permitAll()
+
                         .requestMatchers("/api/v1/auth/resetPassword").hasAnyRole("STUDENT", "INSTRUCTOR", "ADMIN")
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/api/v1/instructor").hasRole("INSTRUCTOR")
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/student/**").hasAnyRole("STUDENT", "INSTRUCTOR", "ADMIN")
-                        .requestMatchers("/api/v1/instructor/**").hasRole("INSTRUCTOR").
-                        requestMatchers("/api/v1/enrollment/**").hasAnyRole("STUDENT", "INSTRUCTOR")
+                        .requestMatchers("/api/v1/instructor/**").hasRole("INSTRUCTOR")
+                        .requestMatchers("/api/v1/enrollment/**").hasAnyRole("STUDENT", "INSTRUCTOR")
                         .anyRequest().authenticated()
-                ).exceptionHandling(e -> e.
-                        authenticationEntryPoint(customAuthenticationEntryPoint)
+                ).exceptionHandling(e -> e
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
                         .accessDeniedHandler(customAccessDeniedHandler))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
-    }
-
-    @Bean
-    public PasswordEncoder coder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
     @Bean
