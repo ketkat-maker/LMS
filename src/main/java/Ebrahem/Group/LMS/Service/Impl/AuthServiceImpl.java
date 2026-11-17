@@ -202,8 +202,9 @@ public class AuthServiceImpl implements AuthService {
 
         UserDetails userDetails = new UserSecurity(user);
         String jwt = jwtProviderService.generateToken(userDetails);
-
+        String tokenId = jwtProviderService.extractTokenId(jwt);
         Token token = Token.builder()
+                .id(tokenId)
                 .token(jwt)
                 .user(user)
                 .revoked(false)

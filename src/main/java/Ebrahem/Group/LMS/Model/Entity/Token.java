@@ -1,6 +1,5 @@
 package Ebrahem.Group.LMS.Model.Entity;
 
-import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,11 +30,4 @@ public class Token {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @PrePersist
-    protected void onCreated() {
-        if (this.id == null) {
-            char[] alphabet = "0123456789abcdefghijklmnopqrstuvwxyz".toCharArray();
-            this.id = NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, alphabet, 12);
-        }
-    }
 }

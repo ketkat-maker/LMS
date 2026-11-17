@@ -1,6 +1,7 @@
 package Ebrahem.Group.LMS.Service.Impl;
 
 import Ebrahem.Group.LMS.Service.JwtProviderService;
+import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -58,9 +59,12 @@ public class JwtProviderServiceImpl implements JwtProviderService {
             UserDetails userDetails,
             long expiration
     ) {
+        char[] alphabet = "0123456789abcdefghijklmnopqrstuvwxyz".toCharArray();
+        String tokenId = NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, alphabet, 12);
         return builder()
                 .claims().add(extraClaims).and()
                 .subject(userDetails.getUsername())
+                .id(tokenId)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSignInKey(), Jwts.SIG.HS256)

@@ -1,7 +1,5 @@
 package Ebrahem.Group.LMS;
 
-import Ebrahem.Group.LMS.Model.Dtos.LogInRequest;
-import Ebrahem.Group.LMS.Service.Impl.AuthServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -19,6 +17,31 @@ public class ProjectApplication {
 
         ApplicationContext run = SpringApplication.run(ProjectApplication.class, args
         );
+//        JwtProviderService jwtService = run.getBean(JwtProviderService.class);
+//
+//        // 2. تجهيز User وهمي للتجربة
+//        User dummyUser = new User(
+//                "Ebrahem Hany",
+//                "ebrahemhany15@gmail.com",
+//                "1Ebrahem45",
+//                Role.STUDENT,
+//                OtpStatus.COMPLETE,
+//                LocalDateTime.now()
+//        );
+//        UserSecurity userDetails = new UserSecurity(dummyUser);
+//
+//        // 3. توليد التوكن واستخراج البيانات منه
+//        String token = jwtService.generateToken(userDetails);
+//        String extractedId = jwtService.extractTokenId(token);
+//        String extractedEmail = jwtService.extractUsername(token);
+//        boolean isValid = jwtService.isTokenValid("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlYnJhaGVtaGFueTEzQGdtYWlsLmNvbSIsImp0aSI6Ims5OXRvODNzejFyaCIsImlhdCI6MTc5NDk1NTI2MCwiZXhwIjoxNzk1MDQxNjYwfQ.22l7EO7LpW4eI486ni8vZIjcQbdWuUrLpZOGzI8EDMw", userDetails);
+//
+//        // 4. طباعة النتيجة في الـ Console
+//        log.info("=== JWT TEST RESULTS ===");
+//        log.info("Generated Token : {}", token);
+//        log.info("Extracted ID    : {}", extractedId); // لازم يطبع كود من 12 حرف وميكونش null
+//        log.info("Extracted Email : {}", extractedEmail);
+//        log.info("Is Token Valid? : {}", isValid);
 //        Object googleMailServiceImpl = run.getBean(GoogleMailServiceImpl.class);
 //        googleMailServiceImpl.getClass()
 //                .getMethod("sendEmail", EmailRequest.class)
