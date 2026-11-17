@@ -34,6 +34,7 @@ public class InstructorFunctionalityServiceImpl implements InstructorFunctionali
         if (courseRepository.existsByCourseTitle(course.courseName()))
             throw new IllegalArgumentException("Course already exists: " + course.courseName());
 
+
         Course created = new Course(course.courseName(), course.courseDuration(), instructor);
         return buildResponse(courseRepository.save(created));
     }
