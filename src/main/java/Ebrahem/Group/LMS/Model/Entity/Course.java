@@ -21,7 +21,7 @@ import java.util.List;
 @Builder
 @Entity
 @Table(name = "courses")
-@SQLDelete(sql = "UPDATE courses SET deleted = true WHERE id = ?")
+@SQLDelete(sql = "UPDATE courses SET deleted = true WHERE course_id = ?")
 @SQLRestriction("deleted = false")
 public class Course {
     @Id

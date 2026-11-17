@@ -1,6 +1,7 @@
 package Ebrahem.Group.LMS.Service.Impl;
 
 
+import Ebrahem.Group.LMS.Excption.UnauthorizedActionException;
 import Ebrahem.Group.LMS.Model.Dtos.*;
 import Ebrahem.Group.LMS.Model.Entity.Token;
 import Ebrahem.Group.LMS.Model.Entity.User;
@@ -179,15 +180,18 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void logOut() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new RuntimeException("User not logged in");
+        if (authentication == null || "anonymousUser".equals(authentication.getPrincipal())) {
+            throw new UnauthorizedActionException("You must be logged in with a valid Bearer token to log out (Token is missing, expired, or revoked).");
         }
-        UserSecurity principal = (UserSecurity) authentication.getPrincipal();
+        if (!(authentication.getPrincipal() instanceof UserSecurity principal)) {
+            throw new UnauthorizedActionException("Invalid authentication principal type: " + authentication.getPrincipal().getClass().getSimpleName());
+        }
         String userId = principal.getUserId();
         tokenRepository.deleteAllByUserId(userId);
     }
 
     private User resetPassword(String newPassword, String userEmail) {
+        
         User user = userRepository.findByUserEmail(userEmail).orElseThrow(() ->
                 new EntityNotFoundException("User isn't exists by this email: " + userEmail));
         if (passwordEncoder.matches(newPassword, user.getUserPassword())) {

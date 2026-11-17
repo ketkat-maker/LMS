@@ -5,6 +5,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -44,12 +46,13 @@ public class GlobalExceptionHandler {
                 .build();
         return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
     }
+
     // ===== Resource & Client Errors =====
     @ExceptionHandler(DuplicateEntityException.class)
     public ResponseEntity<ApiError> handleDuplicateEntity(DuplicateEntityException ex, HttpServletRequest request) {
         ApiError error = ApiError.builder()
                 .status(HttpStatus.NOT_ACCEPTABLE.value())
-                .message("error from Duplicate exception  "+ex.getMessage())
+                .message("error from Duplicate exception  " + ex.getMessage())
                 .path(request.getRequestURI())
                 .timestamp(LocalDateTime.now())
                 .build();
@@ -76,6 +79,21 @@ public class GlobalExceptionHandler {
                 .timestamp(LocalDateTime.now())
                 .build();
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler({
+            UnauthorizedActionException.class,
+            BadCredentialsException.class,
+            AuthenticationException.class
+    })
+    public ResponseEntity<ApiError> handleAuthenticationExceptions(RuntimeException ex, HttpServletRequest request) {
+        ApiError error = ApiError.builder()
+                .status(HttpStatus.UNAUTHORIZED.value())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .timestamp(LocalDateTime.now())
+                .build();
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
 
     // ===== Unexpected Exceptions =====

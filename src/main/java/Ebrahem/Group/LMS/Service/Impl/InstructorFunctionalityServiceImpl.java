@@ -46,7 +46,7 @@ public class InstructorFunctionalityServiceImpl implements InstructorFunctionali
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new EntityNotFoundException("Course not found by Id: " + courseId));
         String instructorName = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (!course.getInstructor().getUserName().equals(instructorName)) {
+        if (!course.getInstructor().getUserEmail().equals(instructorName)) {
             throw new AccessDeniedException("You are not authorized to delete this course");
         }
         courseRepository.delete(course);
@@ -59,7 +59,7 @@ public class InstructorFunctionalityServiceImpl implements InstructorFunctionali
         Course courseById = courseRepository.findById(courseId)
                 .orElseThrow(() -> new IllegalArgumentException("Course not found by this ID: " + courseId));
         String instructorName = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (!courseById.getInstructor().getUserName().equals(instructorName)) {
+        if (!courseById.getInstructor().getUserEmail().equals(instructorName)) {
             throw new AccessDeniedException("You are not authorized to delete this course");
         }
         courseById.setCourseTitle(course.courseName());

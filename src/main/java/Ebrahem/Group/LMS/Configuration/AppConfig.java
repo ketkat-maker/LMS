@@ -59,7 +59,7 @@ public class AppConfig {
                                 "/swagger-ui.html"
                         ).permitAll()
 
-                        .requestMatchers("/api/v1/auth/resetPassword").hasAnyRole("STUDENT", "INSTRUCTOR", "ADMIN")
+                        .requestMatchers("/api/v1/auth/resetPassword", "/api/v1/auth/logout").hasAnyRole("STUDENT", "INSTRUCTOR", "ADMIN")
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/api/v1/instructor").hasRole("INSTRUCTOR")
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
