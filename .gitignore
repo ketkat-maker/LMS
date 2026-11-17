@@ -5,7 +5,7 @@
 !src/
 !GLM-front/
 !.gitignore
-
+!README.md
 # 3. داخل مجلد src: تجاهل مجلد test
 src/test/
 
