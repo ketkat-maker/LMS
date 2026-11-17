@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -19,6 +21,8 @@ import java.util.List;
 @Builder
 @Entity
 @Table(name = "courses")
+@SQLDelete(sql = "UPDATE courses SET deleted = true WHERE id = ?")
+@SQLRestriction("deleted = false")
 public class Course {
     @Id
     @Column(length = 12, columnDefinition = "CHAR(12)", updatable = false, nullable = false)
@@ -33,7 +37,8 @@ public class Course {
     private LocalDateTime createdAt;
     @Column
     private LocalDateTime updatedAt;
-
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted = false;
     @ManyToOne
     @JoinColumn(name = "instructor_id", nullable = false)
     private User instructor;

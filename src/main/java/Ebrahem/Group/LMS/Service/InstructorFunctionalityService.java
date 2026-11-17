@@ -6,7 +6,7 @@ import Ebrahem.Group.LMS.Model.Dtos.CourseResponse;
 public interface InstructorFunctionalityService {
     CourseResponse CreateCourse(CourseRequest course);
 
-    CourseResponse deleteCourse(String courseId);
+    void deleteCourse(String courseId);
 
     CourseResponse updateCourse(String courseId, CourseRequest course);
 

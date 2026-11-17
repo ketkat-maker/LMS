@@ -30,11 +30,11 @@ public class InstructorController {
 
     @Operation(summary = "Delete course by Instructor")
     @DeleteMapping("/deleteCourse/{id}")
-    public ResponseEntity<CourseResponse> deleteCourse(@PathVariable String id) {
-        CourseResponse response = instructorFunctionalityService.deleteCourse(id);
+    public ResponseEntity<String> deleteCourse(@PathVariable String id) {
+        instructorFunctionalityService.deleteCourse(id);
         return new ResponseEntity<>(
-                response,
-                ACCEPTED
+                "Course deleted successfully",
+                NO_CONTENT
         );
     }
 
