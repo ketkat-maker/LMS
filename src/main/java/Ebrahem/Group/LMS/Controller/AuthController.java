@@ -82,7 +82,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
                     .body(new AuthResponse(null, null, null, null, null, "Too many requests. Try again later."));
         }
-        AuthResponse resetPassword = authService.getTokenFromReset(resetPasswordDto.newPassword(), resetPasswordDto.userEmail());
+        AuthResponse resetPassword = authService.getTokenFromReset(resetPasswordDto);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(resetPassword);
     }
 
