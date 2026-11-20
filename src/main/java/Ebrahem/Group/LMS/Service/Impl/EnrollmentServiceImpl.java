@@ -1,6 +1,7 @@
 package Ebrahem.Group.LMS.Service.Impl;
 
 import Ebrahem.Group.LMS.Excption.DuplicateEntityException;
+import Ebrahem.Group.LMS.Excption.UnauthorizedActionException;
 import Ebrahem.Group.LMS.Model.Dtos.EnrollmentRequest;
 import Ebrahem.Group.LMS.Model.Dtos.EnrollmentResponse;
 import Ebrahem.Group.LMS.Model.Entity.Course;
@@ -9,8 +10,8 @@ import Ebrahem.Group.LMS.Model.Entity.User;
 import Ebrahem.Group.LMS.Model.Enums.Status;
 import Ebrahem.Group.LMS.Repositories.CourseRepository;
 import Ebrahem.Group.LMS.Repositories.EnrollmentRepository;
-import Ebrahem.Group.LMS.Repositories.UserRepository;
 import Ebrahem.Group.LMS.Service.EnrollmentService;
+import Ebrahem.Group.LMS.Utilitys.PublicUtility;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,29 +23,28 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class EnrollmentServiceImpl implements EnrollmentService {
     private final EnrollmentRepository enrollmentRepository;
-    private final UserRepository userRepository;
     private final CourseRepository courseRepository;
 
     @PreAuthorize("hasRole('STUDENT')")
     @Override
     @Transactional
     public EnrollmentResponse enrollInCourse(EnrollmentRequest request) {
-        String studentId = request.studentId();
-        String courseID = request.courseID();
-        String studentName = request.studentName();
 
-        User existUser = userRepository.findById(studentId).
-                orElseThrow(() -> new IllegalArgumentException("User does not exist by this name: " + studentName));
-        Course existsCourse = courseRepository.findById(courseID).
-                orElseThrow(() -> new IllegalArgumentException("course does not exist by this name: " + courseID));
+
+        User currentUser = PublicUtility.getCurrentUser();
+        if (!currentUser.getUserId().equals(request.studentId())) {
+            throw new UnauthorizedActionException("You are not authorized to enroll in this course");
+        }
+        Course existsCourse = courseRepository.findById(request.courseID()).
+                orElseThrow(() -> new IllegalArgumentException("course does not exist by this id: " + request.courseID()));
         boolean alreadyEnrolled = enrollmentRepository.existsByUserAndCourse(
-                existUser,
+                currentUser,
                 existsCourse
         );
         if (alreadyEnrolled) {
-            throw new DuplicateEntityException("Student Already enroll by this name: " + studentName);
+            throw new DuplicateEntityException("Student Already enroll by this name: " + currentUser.getUserName());
         }
-        Enrollment savedEnroll = new Enrollment(existUser
+        Enrollment savedEnroll = new Enrollment(currentUser
                 , existsCourse
                 , Status.ACTIVE
                 , 0.0F
@@ -53,27 +53,10 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
         return new EnrollmentResponse(
                 existsCourse.getCourseTitle(),
-                studentName,
-                Status.ACTIVE,
-                LocalDateTime.now(),
-                0.0F
+                currentUser.getUserName(),
+                savedEnroll.getStatus(),
+                savedEnroll.getEnrollAt(),
+                savedEnroll.getProgress()
         );
     }
-
-//    @PreAuthorize("hasRole('STUDENT')")
-//    @Override
-//    public List<EnrollmentResponse> getStudentEnrollments(String studentId) {
-//        if (studentId == null || enrollmentRepository.existsByUser(studentId)) {
-//            throw new RuntimeException("student doesn't have an id ");
-//        }
-//        List<Enrollment> studentEnrolments = enrollmentRepository.findByUser(studentId);
-//        return studentEnrolments.stream()
-//                .map(enrolment -> new EnrollmentResponse(
-//                        enrolment.getCourse().getCourseTitle(),
-//                        enrolment.getUser().getUserName(),
-//                        enrolment.getStatus(),
-//                        enrolment.getEnrollAt(),
-//                        enrolment.getProgress()
-//                )).toList();
-//    }
 }
