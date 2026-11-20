@@ -1,6 +1,6 @@
 package Ebrahem.Group.LMS.Model.Entity;
 
-import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
+import Ebrahem.Group.LMS.Utilitys.PublicUtility;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+
 
 @Data
 @AllArgsConstructor
@@ -55,13 +56,13 @@ public class Course {
     @PrePersist
     void createdAt() {
         if (this.courseId == null) {
-            char[] alphabet = "0123456789abcdefghijklmnopqrstuvwxyz".toCharArray();
-            this.courseId = NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, alphabet, 12);
+            this.courseId = PublicUtility.generateId();
         }
         this.createdAt = LocalDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS);
         this.updatedAt = LocalDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS);
 
     }
+
 
     @PreUpdate
     void updatedAt() {

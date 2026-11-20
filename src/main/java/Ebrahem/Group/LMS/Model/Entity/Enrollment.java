@@ -1,7 +1,7 @@
 package Ebrahem.Group.LMS.Model.Entity;
 
 import Ebrahem.Group.LMS.Model.Enums.Status;
-import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
+import Ebrahem.Group.LMS.Utilitys.PublicUtility;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -53,8 +53,7 @@ public class Enrollment {
     @PrePersist
     private void onEnroll() {
         if (this.enrollmentId == null) {
-            char[] alphabet = "0123456789abcdefghijklmnopqrstuvwxyz".toCharArray();
-            this.enrollmentId = NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, alphabet, 12);
+            this.enrollmentId = PublicUtility.generateId();
             this.enrollAt = LocalDateTime.now();
         }
     }

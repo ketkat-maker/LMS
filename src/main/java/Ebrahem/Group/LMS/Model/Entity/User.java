@@ -2,7 +2,7 @@ package Ebrahem.Group.LMS.Model.Entity;
 
 import Ebrahem.Group.LMS.Model.Enums.OtpStatus;
 import Ebrahem.Group.LMS.Model.Enums.Role;
-import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
+import Ebrahem.Group.LMS.Utilitys.PublicUtility;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -70,8 +70,7 @@ public class User {
     protected void onCreated() {
         this.createdAt = LocalDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS);
         if (this.userId == null) {
-            char[] alphabet = "0123456789abcdefghijklmnopqrstuvwxyz".toCharArray();
-            this.userId = NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, alphabet, 12);
+            this.userId = PublicUtility.generateId();
         }
     }
 }
