@@ -1,8 +1,9 @@
 package Ebrahem.Group.LMS.Service;
 
 import Ebrahem.Group.LMS.Model.Dtos.*;
+import jakarta.transaction.Transactional;
 
-public interface AuthService {
+public interface AuthenticationService {
     String logIn(LogInRequest user);
 
     String signUpViaEmail(String email);
@@ -18,4 +19,6 @@ public interface AuthService {
     AuthResponse completeSignUp(SignUpRequest signUpRequest);
 
 
+    @Transactional
+    AuthResponse refreshToken(RefreshTokenRequest request);
 }

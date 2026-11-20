@@ -11,6 +11,8 @@ public record ResetPasswordDto(
         @NotBlank
         @Size(min = 8)
         @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d).*$")
-        String newPassword
+        String newPassword,
+        @NotBlank
+        String oldPassword
 ) {
 }

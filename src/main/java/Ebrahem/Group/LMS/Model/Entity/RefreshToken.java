@@ -6,13 +6,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "tokens")
-public class Token {
+public class RefreshToken {
 
     @Id
     private String id;
@@ -25,7 +27,8 @@ public class Token {
 
     @Builder.Default
     private boolean expired = false;
-
+    @Column(nullable = false)
+    private LocalDateTime expiryDate;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

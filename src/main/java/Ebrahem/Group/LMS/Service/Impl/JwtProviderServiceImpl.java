@@ -1,7 +1,7 @@
 package Ebrahem.Group.LMS.Service.Impl;
 
 import Ebrahem.Group.LMS.Service.JwtProviderService;
-import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
+import Ebrahem.Group.LMS.Utilitys.PublicUtility;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -19,56 +19,60 @@ import java.util.function.Function;
 import static io.jsonwebtoken.Jwts.builder;
 
 @Service
-//@RequiredArgsConstructor
 public class JwtProviderServiceImpl implements JwtProviderService {
-    private final Long jwtExpiresMs = 86400000L;
+    private final long jwtAccessExpiresMs;
+    private final long jwtRefreshExpiresMs;
     private final String jwtSecret;
 
     public JwtProviderServiceImpl(
-            @Value("${jwt.secret}") String jwtSecret) {
+            @Value("${jwt.secret}") String jwtSecret,
+            @Value("${jwt.access.expires}") long jwtAccessExpiresMs,
+            @Value("${jwt.refresh.expires}") long jwtRefreshExpiresMs
+    ) {
         this.jwtSecret = jwtSecret;
+        this.jwtAccessExpiresMs = jwtAccessExpiresMs;
+        this.jwtRefreshExpiresMs = jwtRefreshExpiresMs;
     }
 
-    @Override
-    public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+    public String generateAccessToken(UserDetails userDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("type", "ACCESS");
+        return buildToken(claims, userDetails, jwtAccessExpiresMs, false);
     }
 
-    @Override
-    public String extractTokenId(String token) {
-        return extractClaim(token, Claims::getId);
+    public String generateRefreshToken(UserDetails userDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("type", "REFRESH");
+        return buildToken(claims, userDetails, jwtRefreshExpiresMs, true);
     }
-
-
-    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
-    }
-
-    public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
-    }
-
-    private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        return buildToken(extraClaims, userDetails, jwtExpiresMs);
-    }
-
 
     private String buildToken(
             Map<String, Object> extraClaims,
             UserDetails userDetails,
-            long expiration
+            long expiration,
+            boolean includeId
     ) {
-        char[] alphabet = "0123456789abcdefghijklmnopqrstuvwxyz".toCharArray();
-        String tokenId = NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, alphabet, 12);
-        return builder()
-                .claims().add(extraClaims).and()
+        var tokenBuilder = builder()
+                .claims().add(extraClaims != null ? extraClaims : Map.of()).and()
                 .subject(userDetails.getUsername())
-                .id(tokenId)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(getSignInKey(), Jwts.SIG.HS256)
-                .compact();
+                .signWith(getSignInKey(), Jwts.SIG.HS256);
+
+        if (includeId) {
+            tokenBuilder.id(PublicUtility.generateId());
+        }
+
+        return tokenBuilder.compact();
+    }
+
+    public String extractTokenType(String token) {
+        return extractClaim(token, claims -> claims.get("type", String.class));
+    }
+
+    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
     }
 
     @Override
@@ -84,6 +88,17 @@ public class JwtProviderServiceImpl implements JwtProviderService {
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
+
+    @Override
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
+
+    @Override
+    public String extractTokenId(String token) {
+        return extractClaim(token, Claims::getId);
+    }
+
 
     private Claims extractAllClaims(String token) {
         return Jwts

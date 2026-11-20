@@ -8,9 +8,9 @@ import Ebrahem.Group.LMS.Model.Entity.Enrollment;
 import Ebrahem.Group.LMS.Model.Entity.User;
 import Ebrahem.Group.LMS.Repositories.CourseRepository;
 import Ebrahem.Group.LMS.Repositories.EnrollmentRepository;
-import Ebrahem.Group.LMS.Repositories.UserRepository;
 import Ebrahem.Group.LMS.Service.Specification.CourseSpecification;
 import Ebrahem.Group.LMS.Service.StudentService;
+import Ebrahem.Group.LMS.Utilitys.PublicUtility;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,19 +19,17 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class StudentServiceImpl implements StudentService {
     private final CourseRepository courseRepository;
-    private final UserRepository studentRepository;
     private final EnrollmentRepository enrollmentRepository;
 
     @Transactional
     @Override
     public List<CourseResponse> getAllCourses() {
-        List<Course> courses = returnAllCourses();
+        List<Course> courses = courseRepository.findAll();
 
         return courses.stream().map(course ->
                 new CourseResponse(
@@ -45,17 +43,11 @@ public class StudentServiceImpl implements StudentService {
         ).toList();
     }
 
-    @Transactional
-    protected List<Course> returnAllCourses() {
-        return courseRepository.findAll();
-    }
-
+    
     @PreAuthorize("hasRole('STUDENT')")
     @Override
     public List<EnrollmentResponse> getStudentEnrollments(String studentId) {
-        Optional<User> student = Optional.of(studentRepository.findById(studentId).orElseThrow(
-                () -> new RuntimeException("student doesn't have an id ")));
-
+        User student = PublicUtility.getCurrentUser();
         List<Enrollment> enrollments = enrollmentRepository.findByUser(student);
 
         return enrollments.stream()

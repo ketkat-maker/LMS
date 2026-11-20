@@ -3,7 +3,9 @@ package Ebrahem.Group.LMS.Service;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public interface JwtProviderService {
-    String generateToken(UserDetails details);
+    String generateAccessToken(UserDetails details);
+
+    String generateRefreshToken(UserDetails details);
 
     String extractUsername(String token);
 
@@ -12,4 +14,5 @@ public interface JwtProviderService {
     boolean isTokenValid(String token, UserDetails userDetails);
 
 
+    String extractTokenType(String requestRefreshToken);
 }

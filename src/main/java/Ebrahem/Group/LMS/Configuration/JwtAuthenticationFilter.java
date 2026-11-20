@@ -4,6 +4,7 @@ package Ebrahem.Group.LMS.Configuration;
 import Ebrahem.Group.LMS.Repositories.TokenRepository;
 import Ebrahem.Group.LMS.Security.UserDetailsServiceImpl;
 import Ebrahem.Group.LMS.Service.Impl.JwtProviderServiceImpl;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,7 +12,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -23,7 +23,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private final JwtProviderServiceImpl authenticateService;
+    private final JwtProviderServiceImpl jwtProviderService;
     private final UserDetailsServiceImpl userDetailsService;
     private final TokenRepository tokenRepository;
 
@@ -42,34 +42,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 
         final String jwt = authHeader.substring(7);
-        final String userEmail = authenticateService.extractUsername(jwt);
+        try {
+            String tokenType = jwtProviderService.extractTokenType(jwt);
+            if (!"ACCESS".equals(tokenType)) {
+                filterChain.doFilter(request, response);
+                return;
+            }
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            final String userEmail = jwtProviderService.extractUsername(jwt);
+            if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
-        if (userEmail != null && authentication == null) {
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-
-            if (authenticateService.isTokenValid(jwt, userDetails)) {
-                String tokenId = authenticateService.extractTokenId(jwt);
-
-                boolean isValidInDb = tokenRepository.findById(tokenId)
-                        .map(t -> !t.isRevoked() && !t.isExpired())
-                        .orElse(false);
-
-                if (isValidInDb) {
-                    UsernamePasswordAuthenticationToken authToken =
-                            new UsernamePasswordAuthenticationToken(
-                                    userDetails,
-                                    null,
-                                    userDetails.getAuthorities()
-                            );
-                    authToken.setDetails(
-                            new WebAuthenticationDetailsSource().buildDetails(request)
+                if (jwtProviderService.isTokenValid(jwt, userDetails)) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
                     );
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
+        } catch (JwtException | IllegalArgumentException e) {
+            SecurityContextHolder.clearContext();
         }
+
         filterChain.doFilter(request, response);
     }
 }

@@ -5,10 +5,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.lang.reflect.InvocationTargetException;
 
 @SpringBootApplication
+@EnableScheduling
 public class ProjectApplication {
     private static final Logger log =
             LoggerFactory.getLogger(ProjectApplication.class);
