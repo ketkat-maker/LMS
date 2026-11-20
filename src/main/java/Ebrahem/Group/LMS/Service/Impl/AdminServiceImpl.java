@@ -19,13 +19,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminServiceImpl implements AdminService {
     private final JwtProviderService jwtProviderService;
-    private final UserRepository repository;
+    private final UserRepository userRepository;
 
 
     @PreAuthorize("hasRole('ADMIN')")
     @Override
     public List<UserResponse> getUsersByRoles(List<Role> roles) {
-        List<User> usersByRole = repository.findByRoleIn(roles);
+        List<User> usersByRole = userRepository.findByRoleIn(roles);
         return usersByRole.stream()
                 .map(user -> new UserResponse(
                         user.getUserId(),
@@ -40,10 +40,10 @@ public class AdminServiceImpl implements AdminService {
     @PreAuthorize("hasRole('ADMIN')")
     @Override
     public void deleteUser(String id) {
-        User user = repository.findById(id)
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("user doesn't exist by this id: " + id));
 
-        repository.delete(user);
+        userRepository.delete(user);
     }
 
 
